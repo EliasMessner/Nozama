@@ -1,0 +1,58 @@
+Produkt(ProdNr:PK, Titel NOT NULL, Rating NOT NULL, Verkaufsrang NOT NULL, Bild)
+
+Buch(ProdNr:PK, Autor: FK REF Person, Seitenzahl NOT NULL, Ersch_Datum NOT NULL, isbn UNIQUE NOT NULL, Verlag NOT NULL,
+	ProdNr FK REF Produkt(ProdNr))
+
+DVD(ProdNr:PK, Format, Laufzeit, Region_Code,
+	ProdNr FK REF Produkt(ProdNr))
+
+Musik_CD(ProdNr:PK, Label NOT NULL, Ersch_Datum NOT NULL,
+	ProdNr FK REF Produkt(ProdNr))
+
+DVD_Person_Beteiligung(ProdID:PK, PersID:PK, Rolle:PK,
+	ProdID FK REF Produkt, PersID FK REF Person(PersID))
+
+CD_Kuenstler(ProdID:PK, PersID:PK,
+	ProdID FK REF Produkt, PersID FK REF Person(PersID))
+
+Person(PersID:PK, Vorname NOT NULL, Nachname NOT NULL)
+
+CD_Titel(ProdNr:PK, Name:PK,
+	ProdNr FK REF Produkt)
+
+Kategorie(KatID:PK, Name NOT NULL)
+
+Ist_Unterkategorie(KatID_ober:PK, KatID_unter:PK,
+	KatID_ober FK REF Kategorie, KatID_unter FK REF Kategorie)
+
+istInKategorie(ProdID:PK, KatID:PK,
+	ProdID FK REF Produkt, KatID FK REF Kategorie)
+
+Filiale(Name:PK, Anschrift:PK)
+
+Filialen_Angebot(ProdID:PK, FilName:PK, FilAnschrift:PK, Preis NOT NULL, Verfuegbarkeit NOT NULL, Zustand NOT NULL,
+	ProdID FK REF Produkt, (FilName, FilAnschrift) FK REF Filiale)
+
+Kunde(KundenNr:PK, Vorname NOT NULL, Nachname NOT NULL, letzteKontoNr NOT NULL, letzteLieferAdresse NOT NULL)
+
+Kauf(KundenNr:PK, ProdID:PK, KaufZeitpunkt:PK, Lieferadresse, KontoNr,
+	KundenNr FK REF Kunde, ProdID FK REF Produkt)
+
+Bewertung(KundenNr:PK, ProdID:PK, Rezension, SterneAnzahl NOT NULL,
+	KundenNr FK REF Kunde, ProdID FK REF Produkt)
+
+Relation "ähnliche produkte" ist symmetrisch. Kann in Tabelle gehalten werden für schnellere Anfragen:
+
+AehnlicheProdukte(ProdID1:PK, ProdID2 FK REF Produkt, anzahlGemeineKategorien NOT NULL,
+	ProdID1 FK REF Produkt)
+
+Integritätsbedingungen:
+Update von AehnlicheProdukte bei insert, delete in produkt, MusikCD, DVD, Buch oder bei insert/delete in istInKategorie.
+Produkt:
+	Rating ist Durchschnitt aus allen Bewertungen für dieses Produkt
+Buch: 	Ersch_Datum <= Heute
+	Seitenzahl > 0
+DVD:	Laufzeit > 0
+CD: 	Ersch_Datum <= Heute
+DVD_Person_Beteiligung:
+	Rolle IN ('A', 'C', 'D') //Actor, Creator, Director
