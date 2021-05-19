@@ -41,10 +41,10 @@ Kauf(KundenNr:PK, ProdID:PK, KaufZeitpunkt:PK, Lieferadresse, KontoNr,
 Bewertung(KundenNr:PK, ProdID:PK, Rezension, SterneAnzahl NOT NULL,
 	KundenNr FK REF Kunde, ProdID FK REF Produkt)
 
-Relation "ähnliche produkte" ist symmetrisch. Kann in Tabelle gehalten werden für schnellere Anfragen:
+Relation "ähnliche produkte" ist symmetrisch. Deswegen benötigen wir Check-Bedingung ProdID1<ProdID2:
 
-AehnlicheProdukte(ProdID1:PK, ProdID2 FK REF Produkt, anzahlGemeineKategorien NOT NULL,
-	ProdID1 FK REF Produkt)
+AehnlicheProdukte(ProdID1:PK, ProdID2:PK, anzahlGemeineKategorien NOT NULL,
+	ProdID1 FK REF Produkt, ProdID2 FK REF Produkt)
 
 Integritätsbedingungen:
 Update von AehnlicheProdukte bei insert, delete in produkt, MusikCD, DVD, Buch oder bei insert/delete in istInKategorie.
