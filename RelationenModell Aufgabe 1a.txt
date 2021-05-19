@@ -30,13 +30,15 @@ istInKategorie(ProdID:PK, KatID:PK,
 
 Filiale(Name:PK, Anschrift:PK)
 
-Filialen_Angebot(ProdID:PK, FilName:PK, FilAnschrift:PK, Preis NOT NULL, Verfuegbarkeit NOT NULL, Zustand NOT NULL,
-	ProdID FK REF Produkt, (FilName, FilAnschrift) FK REF Filiale)
+Artikel(ArtID: PK, ProdID: FK REF Produkt, Preis, Zustand NOT NULL)
+
+Filialen_Angebot(ArtID:PK, FilName:PK, FilAnschrift:PK,
+	ArtID FK REF Artikel, (FilName, FilAnschrift) FK REF Filiale)
 
 Kunde(KundenNr:PK, Vorname NOT NULL, Nachname NOT NULL, letzteKontoNr NOT NULL, letzteLieferAdresse NOT NULL)
 
-Kauf(KundenNr:PK, ProdID:PK, KaufZeitpunkt:PK, Lieferadresse, KontoNr,
-	KundenNr FK REF Kunde, ProdID FK REF Produkt)
+Kauf(KundenNr:PK, ArtID:PK, KaufZeitpunkt:PK, Lieferadresse, KontoNr,
+	KundenNr FK REF Kunde, ArtID FK REF Artikel)
 
 Bewertung(KundenNr:PK, ProdID:PK, Rezension, SterneAnzahl NOT NULL,
 	KundenNr FK REF Kunde, ProdID FK REF Produkt)
