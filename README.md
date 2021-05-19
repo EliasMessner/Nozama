@@ -1,4 +1,4 @@
-# GET Started  
+# Get Started  
 
 Start Docker Containers: `docker-compose up -d --build`  
 
