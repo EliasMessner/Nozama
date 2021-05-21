@@ -7,13 +7,13 @@ CREATE TABLE store(
 
 CREATE TABLE store_inventory(
 	artID INT PRIMARY KEY,
-	prodID INT REF product(prodID),
+    product INT REFERENCES product(prod_number),
 	store_name VARCHAR,
 	store_street VARCHAR,
 	store_zip VARCHAR,
 	article_condition INT NOT NULL,
 	price DOUBLE,
-	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store
+	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store(s_name, street, zip)
 );
 
 CREATE TABLE customer(
@@ -25,28 +25,28 @@ CREATE TABLE customer(
 );
 
 CREATE TABLE sale(
-	customerID INT REF customer,
-	prodID INT REF product,
+	customer INT REFERENCES customer(customerID),
+    product INT REFERENCES product(prod_number),
 	dateTime TIMESTAMP,
 	delivery_address VARCHAR NOT NULL,
 	bank_account VARCHAR NOT NULL,
-	PRIMARY KEY (customerID, prodID, dateTime)
+	PRIMARY KEY (customer, product, dateTime)
 );
 
 CREATE TABLE rating(
-	customerID INT REF customer,
-	prodID INT REF product,
+	customer INT REFERENCES customer(customerID),
+    product INT REFERENCES product(prod_number),
 	stars INT NOT NULL,
 	review TEXT,
-	PRIMARY KEY (customerID, prodID)
+	PRIMARY KEY (customer, product)
 );
 
 CREATE TABLE similar_products(
-	prodID1 INT REF product,
-	prodID2 INT REF product,
+	product1 INT REFERENCES product(prod_number),
+    product2 INT REFERENCES product(prod_number),
 	common_category_count INT NOT NULL,
-	PRIMARY KEY (prodID1, prodID2),
-	CHECK (prodID1 < prodID2)
+	PRIMARY KEY (product1, product2),
+	CHECK (product1 < product2)
 );
 
 
@@ -55,8 +55,8 @@ CREATE OR REPLACE FUNCTION calculate_avg_rating() RETURNS TRIGGER AS $BODY$
 		UPDATE product
 		SET rating = (SELECT AVG(stars)
 					FROM rating
-					WHERE prodID=NEW.prodID)
-		WHERE prodID=NEW.prodID;
+					WHERE product=NEW.product)
+		WHERE product=NEW.product;
 		RETURN NEW;
 	END;
 $BODY$ LANGUAGE plpgsql;
@@ -66,18 +66,18 @@ CREATE TRIGGER calculate_avg_rating
 	FOR EACH ROW
 	EXECUTE PROCEDURE calculate_avg_rating();
 
-CREATE OR REPLACE FUNCTION get_common_cat_count(prodID1 INT, prodID2 INT)
+CREATE OR REPLACE FUNCTION get_common_cat_count(product1 INT, product2 INT)
 	RETURNS INT AS $fun$
 	DECLARE passed BOOLEAN;
 	BEGIN
 		SELECT COUNT(*) INTO passed
 		FROM ((SELECT catID
 			 FROM product_in_category
-			 WHERE prodID=prodID1)
+			 WHERE product=product1)
 			 INTERSECT
 			  (SELECT catID
 			 FROM product_in_category
-			 WHERE prodID=prodID2)
+			 WHERE prodID=product2)
 			 );
 		RETURN passed;
 	END;
@@ -92,7 +92,7 @@ CREATE OR REPLACE FUNCTION update_similar_products() RETURNS TRIGGER AS $BODY$
 	BEGIN
 		FOR t_row IN t_curs LOOP
 			UPDATE similar_products
-			SET common_category_count = (CALL get_common_cat_count(t_row.prodID1, t_row.prodID2))
+			SET common_category_count = (CALL get_common_cat_count(t_row.product1, t_row.product2))
 			WHERE CURRENT OF t_curs;
 		END LOOP;
 		RETURN NEW;
