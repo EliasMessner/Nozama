@@ -3,47 +3,47 @@ CREATE TABLE product(
     title VARCHAR NOT NULL,
     rating SMALLINT NOT NULL,
     sales_rank INT NOT NULL,
-    image BLOB
+    image BYTEA
 )
 
 CREATE TABLE book(
-    prod_number INT PRIMARY KEY REF product(prod_number),
-    author INT REF person(id),
+    prod_number INT PRIMARY KEY REFERENCES product(prod_number),
+    author INT REFERENCES person(id),
     page_number INT,
     publication_date DATE,
-    isbn BIGINT UNSIGNED UNIQUE,
+    isbn BIGINT UNIQUE CHECK (isbn > 0),
     publisher VARCHAR
 )
 
 CREATE TABLE dvd(
-    prod_number INT PRIMARY KEY REF product(prod_number),
+    prod_number INT PRIMARY KEY REFERENCES product(prod_number),
     format VARCHAR,
     duration_minutes INT,
     region_code SMALLINT
 )
 
 CREATE TABLE music_cd(
-    prod_number INT PRIMARY KEY REF product(prod_number),
+    prod_number INT PRIMARY KEY REFERENCES product(prod_number),
     label VARCHAR,
     publication_date DATE,
-    titles VARCHAR ARRAY,
+    titles VARCHAR ARRAY
 )
 
 CREATE TABLE dvd_person(
-    dvd INT REF dvd(prod),
-    person INT REF person(id),
+    dvd INT REFERENCES dvd(prod),
+    person INT REFERENCES person(id),
     role VARCHAR,
     PRIMARY KEY(dvd, person, role)
 )
 
 CREATE TABLE cd_artist(
-    cd INT REF cd(prod_number),
-    artist INT REF person(id),
+    cd INT REFERENCES music_cd(prod_number),
+    artist INT REFERENCES person(id),
     PRIMARY KEY(cd, artist)
 )
 
 CREATE TABLE person(
-    id INT PRIMARY KEY AUTO_INCREMENT,
+    id SERIAL PRIMARY KEY,
     first_name VARCHAR,
     last_name VARCHAR
 )
@@ -53,13 +53,13 @@ CREATE TABLE category(
 )
 
 CREATE TABLE category_hierarchy(
-    super_category VARCHAR REF category(name),
-    sub_category VARCHAR REF category(name),
+    super_category VARCHAR REFERENCES category(name),
+    sub_category VARCHAR REFERENCES category(name),
     PRIMARY KEY(super_category, sub_category)
 )
 
 CREATE TABLE product_category(
-    product INT REF product(prod_number),
-    category VARCHAR REF category(name),
+    product INT REFERENCES product(prod_number),
+    category VARCHAR REFERENCES category(name),
     PRIMARY KEY(product,category)
 )
