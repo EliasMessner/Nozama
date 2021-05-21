@@ -47,3 +47,19 @@ CREATE TABLE person(
     first_name VARCHAR,
     last_name VARCHAR
 )
+
+CREATE TABLE category(
+    name VARCHAR PRIMARY KEY
+)
+
+CREATE TABLE category_hierarchy(
+    super_category VARCHAR REF category(name),
+    sub_category VARCHAR REF category(name),
+    PRIMARY KEY(super_category, sub_category)
+)
+
+CREATE TABLE product_category(
+    product INT REF product(prod_number),
+    category VARCHAR REF category(name),
+    PRIMARY KEY(product,category)
+)
