@@ -82,7 +82,7 @@ public class CategoriesHandler extends DefaultHandler {
         String insertQuery = "INSERT INTO category (name, is_main) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
             insertStmt.setString(1, category.name);
-            insertStmt.setBoolean(2, category.isMain);
+            insertStmt.setBoolean(2, category.isMain); //TODO remove
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             //TODO handle SQL Exception
