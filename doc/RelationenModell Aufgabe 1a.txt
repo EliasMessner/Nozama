@@ -6,27 +6,24 @@ Buch(ProdNr:PK, Autor: FK REF Person, Seitenzahl NOT NULL, Ersch_Datum NOT NULL,
 DVD(ProdNr:PK, Format, Laufzeit, Region_Code,
 	ProdNr FK REF Produkt(ProdNr))
 
-Musik_CD(ProdNr:PK, Label NOT NULL, Ersch_Datum NOT NULL,
+Musik_CD(ProdNr:PK, Label NOT NULL, Ersch_Datum NOT NULL, Titel,
 	ProdNr FK REF Produkt(ProdNr))
 
-DVD_Person_Beteiligung(ProdID:PK, PersID:PK, Rolle:PK,
-	ProdID FK REF Produkt, PersID FK REF Person(PersID))
+DVD_Person(Dvd:PK, Person:PK, Rolle:PK,
+	DVD FK REF DVD(ProdNr), Person FK REF Person(ID))
 
-CD_Kuenstler(ProdID:PK, PersID:PK,
-	ProdID FK REF Produkt, PersID FK REF Person(PersID))
+CD_Kuenstler(Cd:PK, Kuenstler:PK,
+	Cd FK REF Musik_CD(ProdNr), Kuenstler FK REF Person(PersID))
 
-Person(PersID:PK, Vorname NOT NULL, Nachname NOT NULL)
+Person(ID:PK, Vorname NOT NULL, Nachname NOT NULL)
 
-CD_Titel(ProdNr:PK, Name:PK,
-	ProdNr FK REF Produkt)
+Kategorie(Name:PK)
 
-Kategorie(KatID:PK, Name NOT NULL)
+Kategorie_Hierarchie(Ueberkategorie:PK, Unterkategorie:PK,
+	Ueberkategorie FK REF Kategorie(Name), Unterkategorie FK REF Kategorie(Name)
 
-Ist_Unterkategorie(KatID_ober:PK, KatID_unter:PK,
-	KatID_ober FK REF Kategorie, KatID_unter FK REF Kategorie)
-
-istInKategorie(ProdID:PK, KatID:PK,
-	ProdID FK REF Produkt, KatID FK REF Kategorie)
+Produkt_Kategorie(Produkt:PK, Kategorie:PK,
+	Produkt FK REF Produkt(ProdNr), Kategorie FK REF Kategorie(Name))
 
 ################
 
