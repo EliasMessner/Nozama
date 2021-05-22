@@ -10,9 +10,9 @@ CREATE TABLE store_inventory(
     product INT REFERENCES product(prod_number),
 	store_name VARCHAR,
 	store_street VARCHAR,
-	store_zip VARCHAR,
+	store_zip INT,
 	article_condition INT NOT NULL,
-	price DOUBLE,
+	price DOUBLE PRECISION,
 	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store(s_name, street, zip)
 );
 
@@ -55,8 +55,8 @@ CREATE OR REPLACE FUNCTION calculate_avg_rating() RETURNS TRIGGER AS $BODY$
 		UPDATE product
 		SET rating = (SELECT AVG(stars)
 					FROM rating
-					WHERE product=NEW.product)
-		WHERE product=NEW.product;
+					WHERE rating.product=NEW.product)
+		WHERE product_number=NEW.product;
 		RETURN NEW;
 	END;
 $BODY$ LANGUAGE plpgsql;
@@ -81,7 +81,7 @@ CREATE OR REPLACE FUNCTION get_common_cat_count(product1 INT, product2 INT)
 			 );
 		RETURN passed;
 	END;
-$fun$  LANGUAGE plpgsql
+$fun$  LANGUAGE plpgsql;
 
 	
 CREATE OR REPLACE FUNCTION update_similar_products() RETURNS TRIGGER AS $BODY$
