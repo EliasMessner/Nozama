@@ -7,7 +7,8 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.Stack;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class CategoriesHandler extends DefaultHandler {
     private static final String CATEGORIES = "categories";
@@ -15,9 +16,8 @@ public class CategoriesHandler extends DefaultHandler {
     private static final String ITEM = "item";
 
     private StringBuilder elementValue;
-    private Stack<Category> categories;
-    private int categoryID;
-    private Connection conn;
+    private ArrayList<Category> categories;
+    private Category current = null;
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
@@ -30,29 +30,28 @@ public class CategoriesHandler extends DefaultHandler {
 
     @Override
     public void startDocument() throws SAXException {
-        // TODO establish connection
         elementValue = new StringBuilder();
+        categories = new ArrayList<>();
     }
 
     @Override
     public void startElement(String uri, String lName, String qName, Attributes attr) throws SAXException {
         switch (qName) {
             case CATEGORIES:
-                categories = new Stack<>();
+
                 break;
             case CATEGORY:
-                if (!categories.empty()) {
-                    Category parent = categories.peek();
-                    parent.name = elementValue.toString();
-                    elementValue = new StringBuilder();
+                addCategoryNameIfNotSet();
+                Category c = new Category();
+                if (current == null) {
+                    categories.add(c);
+                } else {
+                    current.addChild(c);
                 }
-                categories.push(new Category(null, categories.empty()));
+                current = c;
                 break;
             case ITEM:
-                if (!elementValue.toString().equals("")) {
-                    categories.peek().name = elementValue.toString();
-                    elementValue = new StringBuilder();
-                }
+                addCategoryNameIfNotSet();
                 break;
         }
     }
@@ -61,35 +60,54 @@ public class CategoriesHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         switch (qName) {
             case CATEGORY:
-                if (!elementValue.toString().equals("")) {
-                    categories.peek().name = elementValue.toString();
-                }
-                Category current = categories.pop();
-                addCategory(current);
-                if (!categories.empty()) {
-                    Category parent = categories.peek();
-                    setSubCategory(parent, current);
-                }
+                addCategoryNameIfNotSet();
+                current = current.getParent();
                 break;
             case ITEM:
-                addItemToCategory(elementValue.toString(), categories.peek());
+                current.addItem(elementValue.toString());
                 elementValue = new StringBuilder();
                 break;
         }
     }
 
-    private void addCategory(Category category) {
+    private void addCategoryNameIfNotSet() {
+        if (!elementValue.isEmpty()) {
+            current.setName(elementValue.toString());
+            elementValue = new StringBuilder();
+        }
+    }
+
+    /**
+     * should be called after the xml document is parsed
+     * @param conn the sql connection
+     */
+    public void writeToDataBase(Connection conn) {
+        addCategoriesRecursively(categories, conn, null);
+    }
+
+    private void addCategoriesRecursively(Collection<Category> categories, Connection conn, Category parent) {
+        for (Category category : categories) {
+            addCategory(category, conn);
+            setSubCategory(parent, category, conn);
+            for (String item : category.getItems()) {
+                addItemToCategory(item, category, conn);
+            }
+            addCategoriesRecursively(category.getChildren(), conn, category);
+        }
+    }
+
+    private void addCategory(Category category, Connection conn) {
         String insertQuery = "INSERT INTO category (name, is_main) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-            insertStmt.setString(1, category.name);
-            insertStmt.setBoolean(2, category.isMain); //TODO remove
+            insertStmt.setString(1, category.getName());
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             //TODO handle SQL Exception
         }
+
     }
 
-    private boolean addItemToCategory(String prod_num_str, Category category) {
+    private boolean addItemToCategory(String prod_num_str, Category category, Connection conn) {
         String response = checkProductNumber(prod_num_str);
         if (!response.equals("OK")) {
             // TODO handle bad response
@@ -99,13 +117,20 @@ public class CategoriesHandler extends DefaultHandler {
         String insertQuery = "INSERT INTO product_category (product, category) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
             insertStmt.setInt(1, product_number);
-            insertStmt.setString(2, category.name);
+            insertStmt.setString(2, category.getName());
             insertStmt.executeUpdate();
             return true;
         } catch (SQLException e) {
             //TODO handle SQL Exception
             return false;
         }
+    }
+
+    private void setSubCategory(Category parent, Category child, Connection conn) {
+        if (parent == null) {
+            return;
+        }
+        //TODO SQL stuff
     }
 
     private String checkProductNumber(String prod_num_str) {
@@ -115,9 +140,5 @@ public class CategoriesHandler extends DefaultHandler {
             return e.getMessage();
         }
         return "OK";
-    }
-
-    private void setSubCategory(Category parent, Category child) {
-        //TODO SQL stuff
     }
 }
