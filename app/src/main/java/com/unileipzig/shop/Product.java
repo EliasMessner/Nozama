@@ -21,6 +21,10 @@ public abstract class Product {
         return title;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
     public double getRating() {
         return rating;
     }

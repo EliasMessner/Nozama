@@ -14,11 +14,10 @@ CREATE TABLE product(
 
 CREATE TABLE book(
     prod_number INT PRIMARY KEY REFERENCES product(prod_number),
-    author INT REFERENCES person(id),
     page_number INT,
     publication_date DATE,
     isbn BIGINT UNIQUE CHECK (isbn > 0),
-    publisher VARCHAR
+    publishers VARCHAR ARRAY
 );
 
 CREATE TABLE dvd(
@@ -30,10 +29,16 @@ CREATE TABLE dvd(
 
 CREATE TABLE music_cd(
     prod_number INT PRIMARY KEY REFERENCES product(prod_number),
-    label VARCHAR,
+    labels VARCHAR ARRAY,
     publication_date DATE,
     titles VARCHAR ARRAY
 );
+
+CREATE TABLE book_author(
+    book INT REFERENCES book(prod_number),
+    author INT REFERENCES person(id),
+    PRIMARY KEY(book, author)
+)
 
 CREATE TABLE dvd_person(
     dvd INT REFERENCES dvd(prod_number),

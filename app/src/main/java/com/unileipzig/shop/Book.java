@@ -1,26 +1,22 @@
 package com.unileipzig.shop;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class Book extends Product {
 
-    private Person author;
     private int pageNumber;
-    private Date publicationDate;
+    private LocalDate publicationDate;
     private BigInteger isbn;
-    private String publisher;
+    private List<String> publishers;
 
     Book(int prodNumber, String title) {
         super(prodNumber, title);
-    }
 
-    public Person getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(Person author) {
-        this.author = author;
+        publishers = new ArrayList<>();
     }
 
     public int getPageNumber() {
@@ -31,11 +27,11 @@ public class Book extends Product {
         this.pageNumber = pageNumber;
     }
 
-    public Date getPublicationDate() {
+    public LocalDate getPublicationDate() {
         return publicationDate;
     }
 
-    public void setPublicationDate(Date publicationDate) {
+    public void setPublicationDate(LocalDate publicationDate) {
         this.publicationDate = publicationDate;
     }
 
@@ -47,11 +43,11 @@ public class Book extends Product {
         this.isbn = isbn;
     }
 
-    public String getPublisher() {
-        return publisher;
+    public List<String> getPublishers() {
+        return publishers;
     }
 
-    public void setPublisher(String publisher) {
-        this.publisher = publisher;
+    public void setPublishers(List<String> publishers) {
+        this.publishers = publishers;
     }
 }
