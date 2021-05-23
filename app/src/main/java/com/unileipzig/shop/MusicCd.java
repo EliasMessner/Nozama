@@ -8,8 +8,8 @@ public class MusicCd extends Product {
     private Date publicationDate;
     private String[] titles;
 
-    MusicCd(String prod_number) {
-        this.prod_number = prod_number;
+    MusicCd(int prodNumber, String title) {
+        super(prodNumber, title);
     }
 
     public String getLabel() {

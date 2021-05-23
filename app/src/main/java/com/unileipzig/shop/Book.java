@@ -11,8 +11,8 @@ public class Book extends Product {
     private BigInteger isbn;
     private String publisher;
 
-    Book(String prod_number) {
-        this.prod_number = prod_number;
+    Book(int prodNumber, String title) {
+        super(prodNumber, title);
     }
 
     public Person getAuthor() {

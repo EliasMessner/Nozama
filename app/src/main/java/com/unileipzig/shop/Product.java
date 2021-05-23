@@ -2,18 +2,23 @@ package com.unileipzig.shop;
 
 public abstract class Product {
 
-    String prod_number;
+    int prodNumber;
     String title;
     double rating;
     int salesRank;
     String image;
 
-    public String getTitle() {
-        return title;
+    Product(int prodNumber, String title) {
+        this.prodNumber = prodNumber;
+        this.title = title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public int getProdNumber() {
+        return prodNumber;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public double getRating() {

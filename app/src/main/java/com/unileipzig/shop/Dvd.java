@@ -6,8 +6,8 @@ public class Dvd extends Product {
     private int durationMinutes;
     private short regionCode;
 
-    Dvd(String prod_number) {
-        this.prod_number = prod_number;
+    Dvd(int prodNumber, String title) {
+        super(prodNumber, title);
     }
 
     public String getFormat() {
