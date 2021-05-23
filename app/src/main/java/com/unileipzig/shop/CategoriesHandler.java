@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class CategoriesHandler extends DefaultHandler {
-    private static final String CATEGORIES = "categories";
+    /*private static final String CATEGORIES = "categories";
     private static final String CATEGORY = "category";
     private static final String ITEM = "item";
 
@@ -77,10 +77,6 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
-    /**
-     * should be called after the xml document is parsed
-     * @param conn the sql connection
-     */
     public void writeToDataBase(Connection conn) {
         addCategoriesRecursively(categories, conn, null);
     }
@@ -140,5 +136,5 @@ public class CategoriesHandler extends DefaultHandler {
             return e.getMessage();
         }
         return "OK";
-    }
+    }*/
 }

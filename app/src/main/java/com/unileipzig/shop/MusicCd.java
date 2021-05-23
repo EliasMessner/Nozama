@@ -11,7 +11,7 @@ public class MusicCd extends Product {
     private LocalDate publicationDate;
     private List<String> titles;
 
-    MusicCd(int prodNumber, String title) {
+    MusicCd(String prodNumber, String title) {
         super(prodNumber, title);
 
         labels = new ArrayList<>();

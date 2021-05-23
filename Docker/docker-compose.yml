@@ -22,6 +22,8 @@ services:
             - bridge_network
         depends_on:
             - db
+        volumes:
+            - ../data:/data
         
 networks:
     bridge_network:

@@ -6,7 +6,7 @@ public class Dvd extends Product {
     private int durationMinutes;
     private short regionCode;
 
-    Dvd(int prodNumber, String title) {
+    Dvd(String prodNumber, String title) {
         super(prodNumber, title);
     }
 

@@ -30,24 +30,29 @@ public class ProductHandler extends DefaultHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
 
+        currentValue.setLength(0);
+
         System.out.printf("Start Element : %s%n", qName);
 
         if (qName.equals("item")) {
             switch (attributes.getValue("pgroup")){
                 case "Music":
-                    product = new MusicCd(Integer.parseInt(attributes.getValue("asin")), null);
+                    product = new MusicCd(attributes.getValue("asin"), null);
                     break;
                 case "Book":
-                    product = new Book(Integer.parseInt(attributes.getValue("asin")), null);
+                    product = new Book(attributes.getValue("asin"), null);
                     break;
                 case "DVD":
-                    product = new Dvd(Integer.parseInt(attributes.getValue("asin")), null);
+                    product = new Dvd(attributes.getValue("asin"), null);
                     break;
                 default:
                     throw new SAXException(new XmlException("Incorrect XML format. Specified product type does not exist!"));
             }
 
-            product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
+            if (!attributes.getValue("salesrank").isBlank()) {
+                product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
+            }
+
             product.setImage(attributes.getValue("picture"));
         }
 
@@ -64,6 +69,10 @@ public class ProductHandler extends DefaultHandler {
             // save product to database
         }
 
+        if (currentValue.toString().isBlank()) {
+            return;
+        }
+
         this.readProductTextElements(uri, localName, qName);
     }
 
@@ -78,19 +87,27 @@ public class ProductHandler extends DefaultHandler {
         if (product instanceof MusicCd){
             switch (qName) {
                 case "label":
-                    ((MusicCd) product).getLabels().add(attributes.getValue("name"));
+                    if (!attributes.getValue("name").isBlank()) {
+                        ((MusicCd) product).getLabels().add(attributes.getValue("name"));
+                    }
                     break;
             }
         } else if (product instanceof Book){
             switch(qName) {
                 case "publication":
-                    ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
+                    if (!attributes.getValue("date").isBlank()) {
+                        ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
+                    }
                     break;
                 case "isbn":
-                    ((Book) product).setIsbn(new BigInteger(attributes.getValue("val")));
+                    if (!attributes.getValue("val").isBlank()) {
+                        ((Book) product).setIsbn(attributes.getValue("val"));
+                    }
                     break;
                 case "publisher":
-                    ((Book) product).getPublishers().add(attributes.getValue("name"));
+                    if (!attributes.getValue("name").isBlank()) {
+                        ((Book) product).getPublishers().add(attributes.getValue("name"));
+                    }
                     break;
             }
         }

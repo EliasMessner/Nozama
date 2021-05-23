@@ -10,10 +10,10 @@ public class Book extends Product {
 
     private int pageNumber;
     private LocalDate publicationDate;
-    private BigInteger isbn;
+    private String isbn;
     private List<String> publishers;
 
-    Book(int prodNumber, String title) {
+    Book(String prodNumber, String title) {
         super(prodNumber, title);
 
         publishers = new ArrayList<>();
@@ -35,11 +35,11 @@ public class Book extends Product {
         this.publicationDate = publicationDate;
     }
 
-    public BigInteger getIsbn() {
+    public String getIsbn() {
         return isbn;
     }
 
-    public void setIsbn(BigInteger isbn) {
+    public void setIsbn(String isbn) {
         this.isbn = isbn;
     }
 
