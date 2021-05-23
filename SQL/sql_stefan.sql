@@ -9,7 +9,7 @@ CREATE TABLE product(
     title VARCHAR NOT NULL,
     rating DOUBLE PRECISION NOT NULL,
     sales_rank INT NOT NULL,
-    image BYTEA
+    image VARCHAR
 );
 
 CREATE TABLE book(
