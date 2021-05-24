@@ -5,7 +5,7 @@ CREATE TABLE person(
 );
 
 CREATE TABLE product(
-    prod_number INT PRIMARY KEY,
+    prod_number VARCHAR PRIMARY KEY,
     title VARCHAR NOT NULL,
     rating DOUBLE PRECISION NOT NULL,
     sales_rank INT NOT NULL,
@@ -13,42 +13,42 @@ CREATE TABLE product(
 );
 
 CREATE TABLE book(
-    prod_number INT PRIMARY KEY REFERENCES product(prod_number),
+    prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     page_number INT,
     publication_date DATE,
-    isbn BIGINT UNIQUE CHECK (isbn > 0),
+    isbn VARCHAR UNIQUE,
     publishers VARCHAR ARRAY
 );
 
 CREATE TABLE dvd(
-    prod_number INT PRIMARY KEY REFERENCES product(prod_number),
+    prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     format VARCHAR,
     duration_minutes INT,
     region_code SMALLINT
 );
 
 CREATE TABLE music_cd(
-    prod_number INT PRIMARY KEY REFERENCES product(prod_number),
+    prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     labels VARCHAR ARRAY,
     publication_date DATE,
     titles VARCHAR ARRAY
 );
 
 CREATE TABLE book_author(
-    book INT REFERENCES book(prod_number),
+    book VARCHAR REFERENCES book(prod_number),
     author INT REFERENCES person(id),
     PRIMARY KEY(book, author)
 );
 
 CREATE TABLE dvd_person(
-    dvd INT REFERENCES dvd(prod_number),
+    dvd VARCHAR REFERENCES dvd(prod_number),
     person INT REFERENCES person(id),
     role VARCHAR,
     PRIMARY KEY(dvd, person, role)
 );
 
 CREATE TABLE cd_artist(
-    cd INT REFERENCES music_cd(prod_number),
+    cd VARCHAR REFERENCES music_cd(prod_number),
     artist INT REFERENCES person(id),
     PRIMARY KEY(cd, artist)
 );
@@ -64,7 +64,7 @@ CREATE TABLE category_hierarchy(
 );
 
 CREATE TABLE product_category(
-    product INT REFERENCES product(prod_number),
+    product VARCHAR REFERENCES product(prod_number),
     category VARCHAR REFERENCES category(name),
     PRIMARY KEY(product,category)
 );
