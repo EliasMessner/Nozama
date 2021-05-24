@@ -5,7 +5,7 @@ services:
         environment:
             POSTGRES_PASSWORD: example
         networks:
-                - bridge_network
+            - bridge_network
                 
     adminer:
         image: adminer
@@ -22,6 +22,8 @@ services:
             - bridge_network
         depends_on:
             - db
+        volumes:
+            - ../data:/data
         
 networks:
     bridge_network:
