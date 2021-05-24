@@ -66,7 +66,7 @@ public class ProductHandler extends DefaultHandler {
         System.out.printf("End Element : %s%n", qName);
 
         if (qName.equals("item")) {
-            // save product to database
+            this.persistProduct();
         }
 
         if (currentValue.toString().isBlank()) {
@@ -151,5 +151,9 @@ public class ProductHandler extends DefaultHandler {
                     break;
             }
         }
+    }
+
+    public void persistProduct() {
+
     }
 }
