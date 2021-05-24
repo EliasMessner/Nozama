@@ -7,7 +7,7 @@ CREATE TABLE store(
 
 CREATE TABLE store_inventory(
 	artID INT PRIMARY KEY,
-    product INT REFERENCES product(prod_number),
+    product VARCHAR REFERENCES product(prod_number),
 	store_name VARCHAR,
 	store_street VARCHAR,
 	store_zip INT,
@@ -26,7 +26,7 @@ CREATE TABLE customer(
 
 CREATE TABLE sale(
 	customer INT REFERENCES customer(customerID),
-    product INT REFERENCES product(prod_number),
+    product VARCHAR REFERENCES product(prod_number),
 	dateTime TIMESTAMP,
 	delivery_address VARCHAR NOT NULL,
 	bank_account VARCHAR NOT NULL,
@@ -35,15 +35,15 @@ CREATE TABLE sale(
 
 CREATE TABLE rating(
 	customer INT REFERENCES customer(customerID),
-    product INT REFERENCES product(prod_number),
+    product VARCHAR REFERENCES product(prod_number),
 	stars INT NOT NULL,
 	review TEXT,
 	PRIMARY KEY (customer, product)
 );
 
 CREATE TABLE similar_products(
-	product1 INT REFERENCES product(prod_number),
-    product2 INT REFERENCES product(prod_number),
+	product1 VARCHAR REFERENCES product(prod_number),
+    product2 VARCHAR REFERENCES product(prod_number),
 	common_category_count INT NOT NULL,
 	PRIMARY KEY (product1, product2),
 	CHECK (product1 < product2)
@@ -66,7 +66,7 @@ CREATE TRIGGER calculate_avg_rating
 	FOR EACH ROW
 	EXECUTE PROCEDURE calculate_avg_rating();
 
-CREATE OR REPLACE FUNCTION get_common_cat_count(product1 INT, product2 INT)
+CREATE OR REPLACE FUNCTION get_common_cat_count(product1 VARCHAR, product2 VARCHAR)
 	RETURNS INT AS $fun$
 	DECLARE passed BOOLEAN;
 	BEGIN

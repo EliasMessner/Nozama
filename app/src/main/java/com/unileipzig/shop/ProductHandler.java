@@ -4,13 +4,14 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.math.BigInteger;
+import java.sql.*;
 import java.time.LocalDate;
 
 public class ProductHandler extends DefaultHandler {
 
     private StringBuilder currentValue = new StringBuilder();
     private Product product;
+    private boolean tracks = false;
 
     @Override
     public void startDocument() throws SAXException {
@@ -35,6 +36,8 @@ public class ProductHandler extends DefaultHandler {
         System.out.printf("Start Element : %s%n", qName);
 
         if (qName.equals("item")) {
+            System.out.println("Current item: " + attributes.getValue("asin"));
+
             switch (attributes.getValue("pgroup")){
                 case "Music":
                     product = new MusicCd(attributes.getValue("asin"), null);
@@ -54,6 +57,8 @@ public class ProductHandler extends DefaultHandler {
             }
 
             product.setImage(attributes.getValue("picture"));
+        } else if (qName.equals("tracks")) {
+            tracks = true;
         }
 
         this.readProductAttributes(uri, localName, qName, attributes);
@@ -66,7 +71,13 @@ public class ProductHandler extends DefaultHandler {
         System.out.printf("End Element : %s%n", qName);
 
         if (qName.equals("item")) {
-            this.persistProduct();
+            try {
+                this.persistProduct();
+            } catch (SQLException throwables) {
+                throw new SAXException(throwables);
+            }
+        } else if (qName.equals("tracks")) {
+            tracks = false;
         }
 
         if (currentValue.toString().isBlank()) {
@@ -115,7 +126,7 @@ public class ProductHandler extends DefaultHandler {
     }
 
     public void readProductTextElements(String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("title")) {
+        if (qName.equals("title") && !tracks) {
             product.setTitle(currentValue.toString());
             return;
         }
@@ -153,7 +164,29 @@ public class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void persistProduct() {
+    public void persistProduct() throws SQLException {
+        Connection conn = DatabaseConnector.getConnection();
 
+        PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
+                "sales_rank, image) VALUES (?, ?, 2.5, ?, ?)");
+        pStmt0.setString(1, product.getProdNumber());
+        pStmt0.setString(2, product.getTitle());
+        pStmt0.setInt(3, product.getSalesRank());
+        pStmt0.setString(4, product.getImage());
+        pStmt0.executeUpdate();
+
+        if (product instanceof MusicCd) {
+            PreparedStatement pStmt = conn.prepareStatement("INSERT INTO music_cd (prod_number, labels, " +
+                    "publication_date, titles) VALUES (?, ?, ?, ?)");
+            pStmt.setString(1, product.getProdNumber());
+            pStmt.setArray(2, conn.createArrayOf("VARCHAR", ((MusicCd) product).getLabels().toArray()));
+            if (((MusicCd) product).getPublicationDate() != null) {
+                pStmt.setDate(3, Date.valueOf(((MusicCd) product).getPublicationDate()));
+            } else {
+                pStmt.setNull(3, Types.DATE);
+            }
+            pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+            pStmt.executeUpdate();
+        }
     }
 }
