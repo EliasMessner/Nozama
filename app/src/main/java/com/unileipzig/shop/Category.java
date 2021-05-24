@@ -3,7 +3,7 @@ package com.unileipzig.shop;
 import java.util.ArrayList;
 
 public class Category {
-    /*private String name;
+    private String name;
     private ArrayList<Category> children;
     private Category parent;
     private ArrayList<String> items;
@@ -60,5 +60,5 @@ public class Category {
 
     private void setParent(Category parent) {
         this.parent = parent;
-    }*/
+    }
 }

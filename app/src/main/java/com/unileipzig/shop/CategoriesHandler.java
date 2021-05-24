@@ -77,6 +77,10 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
+    /**
+     * should be called after the xml document is parsed
+     * @param conn the sql connection
+     */
     public void writeToDataBase(Connection conn) {
         addCategoriesRecursively(categories, conn, null);
     }

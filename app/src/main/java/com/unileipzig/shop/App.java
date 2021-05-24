@@ -48,7 +48,7 @@ public class App
 
             SAXParser saxParser = factory.newSAXParser();
 
-            // ProductHandler handler = new ProductHandler();
+            ProductHandler handler = new ProductHandler();
             saxParser.parse(FILENAME_LEIPZIG, handler);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
