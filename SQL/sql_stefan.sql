@@ -16,7 +16,7 @@ CREATE TABLE book(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     page_number INT,
     publication_date DATE,
-    isbn BIGINT UNIQUE CHECK (isbn > 0),
+    isbn VARCHAR UNIQUE,
     publishers VARCHAR ARRAY
 );
 
