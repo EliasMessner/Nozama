@@ -4,20 +4,34 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.*;
 import java.time.LocalDate;
+import java.util.Arrays;
 
 public class ProductHandler extends DefaultHandler {
 
     private StringBuilder currentValue = new StringBuilder();
     private Product product;
     private boolean tracks = false;
+    private PrintWriter printWriter;
 
     @Override
     public void startDocument() throws SAXException {
         super.startDocument();
 
         System.out.println("Start Document");
+
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter("/data/errors.txt");
+            printWriter = new PrintWriter(fileWriter);
+        } catch (IOException e) {
+            throw new SAXException(e);
+        }
     }
 
     @Override
@@ -25,6 +39,8 @@ public class ProductHandler extends DefaultHandler {
         super.endDocument();
 
         System.out.println("End Document");
+
+        printWriter.close();
     }
 
     @Override
@@ -74,7 +90,8 @@ public class ProductHandler extends DefaultHandler {
             try {
                 this.persistProduct();
             } catch (SQLException throwables) {
-                throw new SAXException(throwables);
+                printWriter.println(throwables.getMessage());
+                printWriter.println(Arrays.toString(throwables.getStackTrace()));
             }
         } else if (qName.equals("tracks")) {
             tracks = false;
