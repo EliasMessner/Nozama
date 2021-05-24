@@ -38,7 +38,7 @@ CREATE TABLE book_author(
     book INT REFERENCES book(prod_number),
     author INT REFERENCES person(id),
     PRIMARY KEY(book, author)
-)
+);
 
 CREATE TABLE dvd_person(
     dvd INT REFERENCES dvd(prod_number),
