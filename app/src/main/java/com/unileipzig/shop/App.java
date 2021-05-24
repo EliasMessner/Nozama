@@ -17,7 +17,9 @@ import java.sql.SQLException;
 public class App 
 {
 
-    private static final String FILENAME = "/data/leipzig_transformed.xml";
+    private static final String FILENAME_LEIPZIG = "/data/leipzig_transformed.xml";
+    private static final String FILENAME_DRESDEN = "/data/leipzig.xml";
+    private static final String FILENAME_CATEGORIES = "/data/categories.xml";
 
     public static void main( String[] args )
     {
@@ -46,8 +48,8 @@ public class App
 
             SAXParser saxParser = factory.newSAXParser();
 
-            ProductHandler handler = new ProductHandler();
-            saxParser.parse(FILENAME, handler);
+            // ProductHandler handler = new ProductHandler();
+            saxParser.parse(FILENAME_LEIPZIG, handler);
 
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
