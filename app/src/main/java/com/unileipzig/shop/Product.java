@@ -48,4 +48,5 @@ public abstract class Product {
     public void setImage(String image) {
         this.image = image;
     }
+
 }

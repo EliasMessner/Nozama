@@ -50,4 +50,8 @@ public class Book extends Product {
     public void setPublishers(List<String> publishers) {
         this.publishers = publishers;
     }
+
+    public void addPublisher(String publisher) {
+        this.publishers.add(publisher);
+    }
 }
