@@ -25,16 +25,35 @@ public class App
     {
         System.out.println( "Hello World!" );
 
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-
         try {
+            Class.forName("org.postgresql.Driver");
+            Connection conn = DriverManager.getConnection("jdbc:postgresql://db:5432/postgres",
+                    "postgres", "example") ;
 
+            if (conn != null) {
+                System.out.println("Connected to the database!");
+            } else {
+                System.out.println("Failed to make connection!");
+            }
+
+            SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser saxParser = factory.newSAXParser();
 
+            CategoriesHandler categoriesHandler = new CategoriesHandler();
+            saxParser.parse(FILENAME_CATEGORIES, categoriesHandler);
+            // categoriesHandler.writeToDataBase(conn);
+
+            /*
             ProductHandler handler = new ProductHandler();
             saxParser.parse(FILENAME_LEIPZIG, handler);
+             */
 
+        } catch (SQLException e) {
+            System.err.format("SQL State: %s\n%s", e.getSQLState(), e.getMessage());
+            e.printStackTrace();
         } catch (ParserConfigurationException | SAXException | IOException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
