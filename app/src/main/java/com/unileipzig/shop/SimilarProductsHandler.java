@@ -11,6 +11,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public abstract class SimilarProductsHandler extends DefaultHandler {
     protected boolean isInSimilars;
 
     public SimilarProductsHandler(Connection conn) throws IOException {
+        this.similarProducts = new HashMap<>();
         this.conn = conn;
         this.currentValue = new StringBuilder();
         this.printWriter = new PrintWriter(new FileWriter("/data/errors.txt"));
@@ -32,8 +34,8 @@ public abstract class SimilarProductsHandler extends DefaultHandler {
 
     @Override
     public void endDocument() {
-        printWriter.close();
         writeToDatabase();
+        printWriter.close();
     }
 
     @Override
@@ -69,7 +71,7 @@ public abstract class SimilarProductsHandler extends DefaultHandler {
 
     protected void addSimilarRelation(String prod1, String prod2) {
         if (!this.similarProducts.containsKey(prod1)) {
-            this.similarProducts.put(prod1, new ArrayList<>());
+            this.similarProducts.put(prod1, new ArrayList<String>());
         }
         this.similarProducts.get(prod1).add(prod2);
     }

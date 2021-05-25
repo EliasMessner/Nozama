@@ -4,6 +4,9 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -11,16 +14,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 public class CategoriesHandler extends DefaultHandler {
-    private static final String CATEGORIES = "categories";
-    private static final String CATEGORY = "category";
-    private static final String ITEM = "item";
+    protected static final String CATEGORIES = "categories";
+    protected static final String CATEGORY = "category";
+    protected static final String ITEM = "item";
 
-    private StringBuilder elementValue;
-    private ArrayList<Category> categories;
-    private Category current = null;
-    private Connection conn;
+    protected StringBuilder elementValue;
+    protected ArrayList<Category> categories;
+    protected Category current = null;
+    protected Connection conn;
+    protected PrintWriter printWriter;
 
-    public CategoriesHandler(Connection conn) {
+    public CategoriesHandler(Connection conn) throws IOException {
+        this.printWriter = new PrintWriter(new FileWriter("/data/errors.txt"));
         this.conn = conn;
     }
 
@@ -42,9 +47,6 @@ public class CategoriesHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String lName, String qName, Attributes attr) throws SAXException {
         switch (qName) {
-            case CATEGORIES:
-
-                break;
             case CATEGORY:
                 addCategoryNameIfNotSet();
                 Category c = new Category();
@@ -79,6 +81,7 @@ public class CategoriesHandler extends DefaultHandler {
     public void endDocument() throws SAXException {
         super.endDocument();
         writeToDataBase();
+        printWriter.close();
     }
 
     private void addCategoryNameIfNotSet() {
@@ -110,26 +113,20 @@ public class CategoriesHandler extends DefaultHandler {
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO handle SQL Exception
+            printWriter.println(e.getMessage());
         }
 
     }
 
-    private boolean addItemToCategory(String prod_num_str, Category category, Connection conn) {
-        String response = checkProductNumber(prod_num_str);
-        if (!response.equals("OK")) {
-            // TODO handle bad response
-            return false;
-        }
-        int product_number = Integer.parseInt(prod_num_str);
+    private boolean addItemToCategory(String product_number, Category category, Connection conn) {
         String insertQuery = "INSERT INTO product_category (product, category) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-            insertStmt.setInt(1, product_number);
+            insertStmt.setString(1, product_number);
             insertStmt.setString(2, category.getName());
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO handle SQL Exception
+            printWriter.println(e.getMessage());
             return false;
         }
         return true;
@@ -146,18 +143,9 @@ public class CategoriesHandler extends DefaultHandler {
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO handle SQL Exception
+            printWriter.println(e.getMessage());
             return false;
         }
         return true;
-    }
-
-    private String checkProductNumber(String prod_num_str) {
-        try {
-            Integer.parseInt(prod_num_str);
-        } catch (NumberFormatException e) {
-            return e.getMessage();
-        }
-        return "OK";
     }
 }
