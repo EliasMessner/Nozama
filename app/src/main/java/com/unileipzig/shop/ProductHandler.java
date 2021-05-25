@@ -256,33 +256,42 @@ public class ProductHandler extends DefaultHandler {
     }
 
     public void persistBook() throws SQLException {
-        PreparedStatement pStmt2 = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
                 "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
-        pStmt2.setString(1, product.getProdNumber());
-        pStmt2.setInt(2, ((Book) product).getPageNumber());
+        pStmt.setString(1, product.getProdNumber());
+        pStmt.setInt(2, ((Book) product).getPageNumber());
         if (((Book) product).getPublicationDate() != null) {
-            pStmt2.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
+            pStmt.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
         } else {
-            pStmt2.setNull(3, Types.DATE);
+            pStmt.setNull(3, Types.DATE);
         }
-        pStmt2.setString(4, ((Book) product).getIsbn());
-        pStmt2.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
-        pStmt2.executeUpdate();
+        pStmt.setString(4, ((Book) product).getIsbn());
+        pStmt.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
+        pStmt.executeUpdate();
 
-        PreparedStatement pStmt21 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)",
+        PreparedStatement pStmt2 = conn.prepareStatement("SELECT id FROM person WHERE name = ?");
+        PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)",
                 Statement.RETURN_GENERATED_KEYS);
         PreparedStatement pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) VALUES " +
                 "(?, ?)");
         pStmtRelation.setString(1, product.getProdNumber());
 
         for (Person author: ((Book) product).getAuthors()) {
-            pStmt21.setString(1, author.getName());
-            pStmt21.executeUpdate();
+            pStmt2.setString(1, author.getName());
+            ResultSet authorIds = pStmt2.executeQuery();
 
-            ResultSet generatedKeys = pStmt21.getGeneratedKeys();
-            generatedKeys.next();
+            int authorId;
+            if (authorIds.next()) {
+                authorId = authorIds.getInt(1);
+            } else {
+                pStmt3.setString(1, author.getName());
+                pStmt3.executeUpdate();
+                ResultSet generatedKeys = pStmt3.getGeneratedKeys();
+                generatedKeys.next();
+                authorId = generatedKeys.getInt(1);
+            }
 
-            pStmtRelation.setInt(2, generatedKeys.getInt(1));
+            pStmtRelation.setInt(2, authorId);
             pStmtRelation.executeUpdate();
         }
     }
