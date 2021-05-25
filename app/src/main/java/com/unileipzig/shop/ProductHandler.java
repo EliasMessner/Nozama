@@ -269,19 +269,19 @@ public class ProductHandler extends DefaultHandler {
         pStmt2.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
         pStmt2.executeUpdate();
 
-        PreparedStatement pStmt21 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)");
+        PreparedStatement pStmt21 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)",
+                Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) VALUES " +
+                "(?, ?)");
+        pStmtRelation.setString(1, product.getProdNumber());
 
         for (Person author: ((Book) product).getAuthors()) {
             pStmt21.setString(1, author.getName());
             pStmt21.executeUpdate();
-        }
 
-        PreparedStatement pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) VALUES " +
-                "(?, ?)");
-        pStmtRelation.setString(1, product.getProdNumber());
-        ResultSet generatedKeys = pStmt21.getGeneratedKeys();
+            ResultSet generatedKeys = pStmt21.getGeneratedKeys();
+            generatedKeys.next();
 
-        while (generatedKeys.next()) {
             pStmtRelation.setInt(2, generatedKeys.getInt(1));
             pStmtRelation.executeUpdate();
         }
