@@ -18,6 +18,11 @@ public class CategoriesHandler extends DefaultHandler {
     private StringBuilder elementValue;
     private ArrayList<Category> categories;
     private Category current = null;
+    private Connection conn;
+
+    public CategoriesHandler(Connection conn) {
+        this.conn = conn;
+    }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
@@ -70,6 +75,12 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
+    @Override
+    public void endDocument() throws SAXException {
+        super.endDocument();
+        writeToDataBase();
+    }
+
     private void addCategoryNameIfNotSet() {
         if (!elementValue.toString().isBlank()) {
             current.setName(elementValue.toString());
@@ -77,11 +88,7 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
-    /**
-     * should be called after the xml document is parsed
-     * @param conn the sql connection
-     */
-    public void writeToDataBase(Connection conn) {
+    private void writeToDataBase() {
         addCategoriesRecursively(categories, conn, null);
     }
 

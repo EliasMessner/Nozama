@@ -10,12 +10,14 @@ public class DatabaseConnector {
     static Connection conn;
 
     public static Connection getConnection(){
-        if (conn != null) {
-            return conn;
-        } else {
+        return getConnection("test_1");
+    }
+
+    public static Connection getConnection(String database){
+        if (conn == null) {
             try {
                 Class.forName("org.postgresql.Driver");
-                conn = DriverManager.getConnection("jdbc:postgresql://db:5432/test_1",
+                conn = DriverManager.getConnection("jdbc:postgresql://db:5432/" + database,
                         "postgres", "example");
 
                 if (conn != null) {
@@ -28,8 +30,7 @@ public class DatabaseConnector {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            return conn;
         }
+        return conn;
     }
 }
