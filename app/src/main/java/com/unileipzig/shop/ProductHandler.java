@@ -76,13 +76,13 @@ public class ProductHandler extends DefaultHandler {
                     product = new MusicCd(attributes.getValue("asin"), null);
                     break;
                 case "Book":
+                case "Buch":
                     product = new Book(attributes.getValue("asin"), null);
                     break;
                 case "DVD":
                     product = new Dvd(attributes.getValue("asin"), null);
                     break;
                 default:
-                    //throw new SAXException(new XmlException("Incorrect XML format. Specified product type does not exist!"));
                     printWriter.println("ERROR: product type " + attributes.getValue("pgroup") + " does not exist.");
             }
 

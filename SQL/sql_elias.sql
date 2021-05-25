@@ -45,8 +45,7 @@ CREATE TABLE similar_products(
 	product1 VARCHAR REFERENCES product(prod_number),
     product2 VARCHAR REFERENCES product(prod_number),
 	common_category_count INT NOT NULL,
-	PRIMARY KEY (product1, product2),
-	CHECK (product1 < product2)
+	PRIMARY KEY (product1, product2)
 );
 
 
