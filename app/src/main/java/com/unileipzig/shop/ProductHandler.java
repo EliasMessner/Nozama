@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductHandler extends DefaultHandler {
 
@@ -117,6 +118,7 @@ public class ProductHandler extends DefaultHandler {
         } else if (qName.equals("item") && !similars) {
             try {
                 this.persistProduct();
+                this.persistPersonAndRelations();
             } catch (SQLException throwables) {
                 printWriter.println(throwables.getMessage());
                 throwables.printStackTrace();
@@ -148,6 +150,9 @@ public class ProductHandler extends DefaultHandler {
                     if (labelIsAttribute && !attributes.getValue("name").isBlank()) {
                         ((MusicCd) product).getLabels().add(attributes.getValue("name"));
                     }
+                    break;
+                case "artist":
+                    ((MusicCd) product).getArtists().add(new Person(attributes.getValue("name")));
                     break;
             }
         } else if (product instanceof Book){
@@ -231,17 +236,7 @@ public class ProductHandler extends DefaultHandler {
         pStmt0.executeUpdate();
 
         if (product instanceof MusicCd) {
-            PreparedStatement pStmt1 = conn.prepareStatement("INSERT INTO music_cd (prod_number, labels, " +
-                    "publication_date, titles) VALUES (?, ?, ?, ?)");
-            pStmt1.setString(1, product.getProdNumber());
-            pStmt1.setArray(2, conn.createArrayOf("VARCHAR", ((MusicCd) product).getLabels().toArray()));
-            if (((MusicCd) product).getPublicationDate() != null) {
-                pStmt1.setDate(3, Date.valueOf(((MusicCd) product).getPublicationDate()));
-            } else {
-                pStmt1.setNull(3, Types.DATE);
-            }
-            pStmt1.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
-            pStmt1.executeUpdate();
+            this.persistMusicCd();
         } else if (product instanceof Book) {
             this.persistBook();
         } else if (product instanceof Dvd){
@@ -268,30 +263,62 @@ public class ProductHandler extends DefaultHandler {
         pStmt.setString(4, ((Book) product).getIsbn());
         pStmt.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
         pStmt.executeUpdate();
+    }
+
+    public void persistMusicCd() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO music_cd (prod_number, labels, " +
+                "publication_date, titles) VALUES (?, ?, ?, ?)");
+        pStmt.setString(1, product.getProdNumber());
+        pStmt.setArray(2, conn.createArrayOf("VARCHAR", ((MusicCd) product).getLabels().toArray()));
+        if (((MusicCd) product).getPublicationDate() != null) {
+            pStmt.setDate(3, Date.valueOf(((MusicCd) product).getPublicationDate()));
+        } else {
+            pStmt.setNull(3, Types.DATE);
+        }
+        pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+        pStmt.executeUpdate();
+    }
+
+    public void persistPersonAndRelations() throws SQLException {
+        String productPersonTableName;
+        String columnNames;
+        List<Person> personList = new ArrayList<>();
+
+        if (product instanceof MusicCd) {
+            productPersonTableName = "cd_artist";
+            columnNames = "(cd, artist)";
+            personList = ((MusicCd) product).getArtists();
+        } else if (product instanceof Book) {
+            productPersonTableName = "book_author";
+            columnNames = "(book, author)";
+            personList = ((Book) product).getAuthors();
+        } else {
+            return;
+        }
 
         PreparedStatement pStmt2 = conn.prepareStatement("SELECT id FROM person WHERE name = ?");
         PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)",
                 Statement.RETURN_GENERATED_KEYS);
-        PreparedStatement pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) VALUES " +
-                "(?, ?)");
+        PreparedStatement pStmtRelation = conn.prepareStatement("INSERT INTO " + productPersonTableName + " " +
+                columnNames + " VALUES (?, ?)");
         pStmtRelation.setString(1, product.getProdNumber());
 
-        for (Person author: ((Book) product).getAuthors()) {
-            pStmt2.setString(1, author.getName());
-            ResultSet authorIds = pStmt2.executeQuery();
+        for (Person person: personList) {
+            pStmt2.setString(1, person.getName());
+            ResultSet personIds = pStmt2.executeQuery();
 
-            int authorId;
-            if (authorIds.next()) {
-                authorId = authorIds.getInt(1);
+            int personId;
+            if (personIds.next()) {
+                personId = personIds.getInt(1);
             } else {
-                pStmt3.setString(1, author.getName());
+                pStmt3.setString(1, person.getName());
                 pStmt3.executeUpdate();
                 ResultSet generatedKeys = pStmt3.getGeneratedKeys();
                 generatedKeys.next();
-                authorId = generatedKeys.getInt(1);
+                personId = generatedKeys.getInt(1);
             }
 
-            pStmtRelation.setInt(2, authorId);
+            pStmtRelation.setInt(2, personId);
             pStmtRelation.executeUpdate();
         }
     }

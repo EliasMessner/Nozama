@@ -10,12 +10,14 @@ public class MusicCd extends Product {
     private List<String> labels;
     private LocalDate publicationDate;
     private List<String> titles;
+    private List<Person> artists;
 
     MusicCd(String prodNumber, String title) {
         super(prodNumber, title);
 
         labels = new ArrayList<>();
         titles = new ArrayList<>();
+        artists = new ArrayList<>();
     }
 
     public List<String> getLabels() {
@@ -48,5 +50,13 @@ public class MusicCd extends Product {
 
     public void addTitle(String title) {
         this.titles.add(title);
+    }
+
+    public List<Person> getArtists() {
+        return artists;
+    }
+
+    public void setArtists(List<Person> artists) {
+        this.artists = artists;
     }
 }
