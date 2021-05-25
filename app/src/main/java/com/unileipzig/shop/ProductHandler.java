@@ -23,9 +23,17 @@ public class ProductHandler extends DefaultHandler {
     protected Shop shop;
     protected Connection conn;
 
-    public ProductHandler(Connection conn) {
+    public ProductHandler(Connection conn, String errorPath) throws IOException {
         super();
         this.conn = conn;
+
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(errorPath);
+            printWriter = new PrintWriter(fileWriter);
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -33,14 +41,6 @@ public class ProductHandler extends DefaultHandler {
         super.startDocument();
 
         System.out.println("Start Document");
-
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter("/data/errors.txt");
-            printWriter = new PrintWriter(fileWriter);
-        } catch (IOException e) {
-            throw new SAXException(e);
-        }
     }
 
     @Override
@@ -167,6 +167,9 @@ public class ProductHandler extends DefaultHandler {
                         ((Book) product).getPublishers().add(attributes.getValue("name"));
                     }
                     break;
+                case "author":
+                    ((Book) product).getAuthors().add(new Person(attributes.getValue("name")));
+                    break;
             }
         }
     }
@@ -240,18 +243,7 @@ public class ProductHandler extends DefaultHandler {
             pStmt1.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
             pStmt1.executeUpdate();
         } else if (product instanceof Book) {
-            PreparedStatement pStmt2 = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
-                    "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
-            pStmt2.setString(1, product.getProdNumber());
-            pStmt2.setInt(2, ((Book) product).getPageNumber());
-            if (((Book) product).getPublicationDate() != null) {
-                pStmt2.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
-            } else {
-                pStmt2.setNull(3, Types.DATE);
-            }
-            pStmt2.setString(4, ((Book) product).getIsbn());
-            pStmt2.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
-            pStmt2.executeUpdate();
+            this.persistBook();
         } else if (product instanceof Dvd){
             PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO dvd (prod_number, format, " +
                     "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
@@ -260,6 +252,38 @@ public class ProductHandler extends DefaultHandler {
             pStmt3.setInt(3, ((Dvd) product).getDurationMinutes());
             pStmt3.setShort(4, ((Dvd) product).getRegionCode());
             pStmt3.executeUpdate();
+        }
+    }
+
+    public void persistBook() throws SQLException {
+        PreparedStatement pStmt2 = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
+                "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
+        pStmt2.setString(1, product.getProdNumber());
+        pStmt2.setInt(2, ((Book) product).getPageNumber());
+        if (((Book) product).getPublicationDate() != null) {
+            pStmt2.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
+        } else {
+            pStmt2.setNull(3, Types.DATE);
+        }
+        pStmt2.setString(4, ((Book) product).getIsbn());
+        pStmt2.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
+        pStmt2.executeUpdate();
+
+        PreparedStatement pStmt21 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)");
+
+        for (Person author: ((Book) product).getAuthors()) {
+            pStmt21.setString(1, author.getName());
+            pStmt21.executeUpdate();
+        }
+
+        PreparedStatement pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) VALUES " +
+                "(?, ?)");
+        pStmtRelation.setString(1, product.getProdNumber());
+        ResultSet generatedKeys = pStmt21.getGeneratedKeys();
+
+        while (generatedKeys.next()) {
+            pStmtRelation.setInt(2, generatedKeys.getInt(1));
+            pStmtRelation.executeUpdate();
         }
     }
 }

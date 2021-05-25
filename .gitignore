@@ -1,3 +1,5 @@
 **/.idea
 data/errors.txt
+data/errorsDresden.txt
 **/*.iml
+**/target
