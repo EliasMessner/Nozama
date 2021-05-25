@@ -41,4 +41,12 @@ public class MusicCd extends Product {
     public void setTitles(List<String> titles) {
         this.titles = titles;
     }
+
+    public void addLabel(String label) {
+        this.labels.add(label);
+    }
+
+    public void addTitle(String title) {
+        this.titles.add(title);
+    }
 }

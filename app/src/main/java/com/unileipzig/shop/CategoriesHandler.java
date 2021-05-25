@@ -18,6 +18,11 @@ public class CategoriesHandler extends DefaultHandler {
     private StringBuilder elementValue;
     private ArrayList<Category> categories;
     private Category current = null;
+    private Connection conn;
+
+    public CategoriesHandler(Connection conn) {
+        this.conn = conn;
+    }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
@@ -70,24 +75,26 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
+    @Override
+    public void endDocument() throws SAXException {
+        super.endDocument();
+        writeToDataBase();
+    }
+
     private void addCategoryNameIfNotSet() {
-        if (elementValue.length() != 0) {
+        if (!elementValue.toString().isBlank()) {
             current.setName(elementValue.toString());
             elementValue = new StringBuilder();
         }
     }
 
-    /**
-     * should be called after the xml document is parsed
-     * @param conn the sql connection
-     */
-    public void writeToDataBase(Connection conn) {
+    private void writeToDataBase() {
         addCategoriesRecursively(categories, conn, null);
     }
 
     private void addCategoriesRecursively(Collection<Category> categories, Connection conn, Category parent) {
         for (Category category : categories) {
-            addCategory(category, conn);
+            addCategoryIfNotExists(category, conn);
             setSubCategory(parent, category, conn);
             for (String item : category.getItems()) {
                 addItemToCategory(item, category, conn);
@@ -96,12 +103,13 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
-    private void addCategory(Category category, Connection conn) {
-        String insertQuery = "INSERT INTO category (name, is_main) VALUES (?, ?)";
+    private void addCategoryIfNotExists(Category category, Connection conn) {
+        String insertQuery = "INSERT INTO category VALUES (?) ON CONFLICT DO NOTHING";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
             insertStmt.setString(1, category.getName());
             insertStmt.executeUpdate();
         } catch (SQLException e) {
+            e.printStackTrace();
             //TODO handle SQL Exception
         }
 
@@ -119,18 +127,29 @@ public class CategoriesHandler extends DefaultHandler {
             insertStmt.setInt(1, product_number);
             insertStmt.setString(2, category.getName());
             insertStmt.executeUpdate();
-            return true;
         } catch (SQLException e) {
+            e.printStackTrace();
             //TODO handle SQL Exception
             return false;
         }
+        return true;
     }
 
-    private void setSubCategory(Category parent, Category child, Connection conn) {
+    private boolean setSubCategory(Category parent, Category child, Connection conn) {
         if (parent == null) {
-            return;
+            return true;
         }
-        //TODO SQL stuff
+        String insertQuery = "INSERT INTO category_hierarchy (super_category, sub_category) VALUES (?, ?) ON CONFLICT (super_category, sub_category) DO NOTHING";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+            insertStmt.setString(1, parent.getName());
+            insertStmt.setString(2, child.getName());
+            insertStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            //TODO handle SQL Exception
+            return false;
+        }
+        return true;
     }
 
     private String checkProductNumber(String prod_num_str) {

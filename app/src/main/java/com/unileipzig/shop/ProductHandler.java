@@ -4,6 +4,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.xml.crypto.Data;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,10 +15,18 @@ import java.util.Arrays;
 
 public class ProductHandler extends DefaultHandler {
 
-    private StringBuilder currentValue = new StringBuilder();
-    private Product product;
-    private boolean tracks = false;
-    private PrintWriter printWriter;
+    protected StringBuilder currentValue = new StringBuilder();
+    protected Product product;
+    protected boolean tracks = false;
+    protected boolean similars = false;
+    protected PrintWriter printWriter;
+    protected Shop shop;
+    protected Connection conn;
+
+    public ProductHandler(Connection conn) {
+        super();
+        this.conn = conn;
+    }
 
     @Override
     public void startDocument() throws SAXException {
@@ -45,13 +54,21 @@ public class ProductHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        startElement(uri, localName, qName, attributes, true, true, true);
+    }
+
+    public void startElement(String uri, String localName, String qName, Attributes attributes, boolean imgIsAttribute, boolean publisherIsAttribute, boolean labelIsAttribute) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
 
         currentValue.setLength(0);
 
-        System.out.printf("Start Element : %s%n", qName);
-
-        if (qName.equals("item")) {
+        //System.out.printf("Start Element : %s%n", qName);
+        if (qName.equals("shop")) {
+            shop = new Shop(attributes.getValue("name"),
+                    attributes.getValue("street"),
+                    Integer.parseInt(attributes.getValue("zip")));
+        }
+        if (qName.equals("item") && !similars) {
             System.out.println("Current item: " + attributes.getValue("asin"));
 
             switch (attributes.getValue("pgroup")){
@@ -59,42 +76,55 @@ public class ProductHandler extends DefaultHandler {
                     product = new MusicCd(attributes.getValue("asin"), null);
                     break;
                 case "Book":
+                case "Buch":
                     product = new Book(attributes.getValue("asin"), null);
                     break;
                 case "DVD":
                     product = new Dvd(attributes.getValue("asin"), null);
                     break;
                 default:
-                    throw new SAXException(new XmlException("Incorrect XML format. Specified product type does not exist!"));
+                    printWriter.println("ERROR: product type " + attributes.getValue("pgroup") + " does not exist.");
             }
 
             if (!attributes.getValue("salesrank").isBlank()) {
                 product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
             }
 
-            product.setImage(attributes.getValue("picture"));
+            if (imgIsAttribute) {
+                product.setImage(attributes.getValue("picture"));
+            }
         } else if (qName.equals("tracks")) {
             tracks = true;
+        } else if (qName.equals("similars")) {
+            similars = true;
         }
 
-        this.readProductAttributes(uri, localName, qName, attributes);
+        this.readProductAttributes(uri, localName, qName, attributes, publisherIsAttribute, labelIsAttribute);
     }
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         super.endElement(uri, localName, qName);
 
-        System.out.printf("End Element : %s%n", qName);
+        //System.out.printf("End Element : %s%n", qName);
 
-        if (qName.equals("item")) {
+        if (qName.equals("shop")) {
+            try {
+                persistShop();
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+        } else if (qName.equals("item") && !similars) {
             try {
                 this.persistProduct();
             } catch (SQLException throwables) {
                 printWriter.println(throwables.getMessage());
-                printWriter.println(Arrays.toString(throwables.getStackTrace()));
+                throwables.printStackTrace();
             }
         } else if (qName.equals("tracks")) {
             tracks = false;
+        } else if (qName.equals("similars")) {
+            similars = false;
         }
 
         if (currentValue.toString().isBlank()) {
@@ -111,11 +141,11 @@ public class ProductHandler extends DefaultHandler {
         currentValue.append(ch, start, length);
     }
 
-    public void readProductAttributes(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+    public void readProductAttributes(String uri, String localName, String qName, Attributes attributes, boolean publisherIsAttribute, boolean labelIsAttribute) throws SAXException {
         if (product instanceof MusicCd){
             switch (qName) {
                 case "label":
-                    if (!attributes.getValue("name").isBlank()) {
+                    if (labelIsAttribute && !attributes.getValue("name").isBlank()) {
                         ((MusicCd) product).getLabels().add(attributes.getValue("name"));
                     }
                     break;
@@ -133,21 +163,19 @@ public class ProductHandler extends DefaultHandler {
                     }
                     break;
                 case "publisher":
-                    if (!attributes.getValue("name").isBlank()) {
+                    if (publisherIsAttribute && !attributes.getValue("name").isBlank()) {
                         ((Book) product).getPublishers().add(attributes.getValue("name"));
                     }
                     break;
             }
         }
-
     }
 
     public void readProductTextElements(String uri, String localName, String qName) throws SAXException {
-        if (qName.equals("title") && !tracks) {
+        if (qName.equals("title") && !tracks && !similars) {
             product.setTitle(currentValue.toString());
             return;
         }
-
         if (product instanceof MusicCd) {
             switch (qName) {
                 case "releaseDate":
@@ -181,9 +209,16 @@ public class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void persistProduct() throws SQLException {
-        Connection conn = DatabaseConnector.getConnection();
+    public void persistShop() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store (s_name, street, zip) VALUES (?, ?, ?)" +
+                "ON CONFLICT (s_name, street, zip) DO NOTHING");
+        pStmt.setString(1, shop.getName());
+        pStmt.setString(2, shop.getStreet());
+        pStmt.setInt(3, shop.getZip());
+        pStmt.executeUpdate();
+    }
 
+    public void persistProduct() throws SQLException {
         PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
                 "sales_rank, image) VALUES (?, ?, 2.5, ?, ?)");
         pStmt0.setString(1, product.getProdNumber());
