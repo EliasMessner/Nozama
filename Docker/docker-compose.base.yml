@@ -13,17 +13,6 @@ services:
             - 8080:8080
         networks:
             - bridge_network
-    
-    application:
-        build:
-            context: ..
-            dockerfile: Docker/Dockerfile
-        networks:
-            - bridge_network
-        depends_on:
-            - db
-        volumes:
-            - ../data:/data
         
 networks:
     bridge_network:

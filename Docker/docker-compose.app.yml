@@ -1,0 +1,13 @@
+version: "3.3"
+
+services:
+    application:
+        build:
+            context: ..
+            dockerfile: Docker/Dockerfile
+        networks:
+            - bridge_network
+        depends_on:
+            - db
+        volumes:
+            - ../data:/data
