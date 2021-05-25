@@ -6,7 +6,7 @@ CREATE TABLE store(
 );
 
 CREATE TABLE store_inventory(
-	ean INT PRIMARY KEY,
+	article_number SERIAL PRIMARY KEY,
     product VARCHAR REFERENCES product(prod_number),
 	store_name VARCHAR,
 	store_street VARCHAR,
