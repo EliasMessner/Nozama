@@ -65,7 +65,8 @@ CREATE TRIGGER calculate_avg_rating
 	FOR EACH ROW
 	EXECUTE PROCEDURE calculate_avg_rating();
 
-CREATE OR REPLACE FUNCTION get_common_categories(product1 VARCHAR, product2 VARCHAR)
+
+/*CREATE OR REPLACE FUNCTION get_common_categories(product1 VARCHAR, product2 VARCHAR)
     RETURNS TABLE (catID INT) AS $fun$
     BEGIN
         RETURN QUERY ((SELECT catID
@@ -108,4 +109,4 @@ $BODY$ LANGUAGE plpgsql;
 CREATE TRIGGER update_similar_products
 	AFTER INSERT OR UPDATE ON product_category
 	FOR EACH ROW
-	EXECUTE PROCEDURE update_similar_products();
+	EXECUTE PROCEDURE update_similar_products();*/
