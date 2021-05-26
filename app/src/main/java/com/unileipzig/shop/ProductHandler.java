@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class ProductHandler extends DefaultHandler {
 
     protected StringBuilder currentValue = new StringBuilder();
     protected Product product;
+    protected Offer offer;
     protected boolean tracks = false;
     protected boolean similars = false;
     protected PrintWriter printWriter;
@@ -68,6 +70,11 @@ public class ProductHandler extends DefaultHandler {
             shop = new Shop(attributes.getValue("name"),
                     attributes.getValue("street"),
                     Integer.parseInt(attributes.getValue("zip")));
+            try {
+                this.persistShop();
+            } catch (SQLException throwables) {
+                printWriter.println(throwables.getMessage());
+            }
         }
         if (qName.equals("item") && !similars) {
             System.out.println("Current item: " + attributes.getValue("asin"));
@@ -94,6 +101,8 @@ public class ProductHandler extends DefaultHandler {
             if (imgIsAttribute) {
                 product.setImage(attributes.getValue("picture"));
             }
+
+            offer = new Offer(product, shop);
         } else if (qName.equals("tracks")) {
             tracks = true;
         } else if (qName.equals("similars")) {
@@ -101,6 +110,10 @@ public class ProductHandler extends DefaultHandler {
         }
 
         this.readProductAttributes(uri, localName, qName, attributes, publisherIsAttribute, labelIsAttribute);
+
+        if (qName.equals("price")) {
+            offer.setArticleCondition(attributes.getValue("state"));
+        }
     }
 
     @Override
@@ -109,13 +122,7 @@ public class ProductHandler extends DefaultHandler {
 
         //System.out.printf("End Element : %s%n", qName);
 
-        if (qName.equals("shop")) {
-            try {
-                persistShop();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        } else if (qName.equals("item") && !similars) {
+        if (qName.equals("item") && !similars) {
             try {
                 conn.setAutoCommit(false);
                 this.persistProduct();
@@ -146,6 +153,12 @@ public class ProductHandler extends DefaultHandler {
         }
 
         this.readProductTextElements(uri, localName, qName);
+
+        if (qName.equals("price")) {
+            BigDecimal price100 = new BigDecimal(currentValue.toString());
+            BigDecimal price = price100.divide(new BigDecimal("100"));
+            offer.setPrice(price);
+        }
     }
 
     @Override

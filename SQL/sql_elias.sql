@@ -11,8 +11,8 @@ CREATE TABLE store_inventory(
 	store_name VARCHAR,
 	store_street VARCHAR,
 	store_zip INT,
-	article_condition INT NOT NULL,
-	price DOUBLE PRECISION,
+	article_condition VARCHAR NOT NULL,
+	price DECIMAL(10,2),
 	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store(s_name, street, zip)
 );
 
