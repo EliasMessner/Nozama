@@ -117,11 +117,23 @@ public class ProductHandler extends DefaultHandler {
             }
         } else if (qName.equals("item") && !similars) {
             try {
+                conn.setAutoCommit(false);
                 this.persistProduct();
                 this.persistPersonAndRelations();
+                conn.commit();
             } catch (SQLException throwables) {
+                try {
+                    conn.rollback();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 printWriter.println(throwables.getMessage());
-                throwables.printStackTrace();
+            } finally {
+                try {
+                    conn.setAutoCommit(true);
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
             }
         } else if (qName.equals("tracks")) {
             tracks = false;
@@ -251,14 +263,8 @@ public class ProductHandler extends DefaultHandler {
             this.persistMusicCd();
         } else if (product instanceof Book) {
             this.persistBook();
-        } else if (product instanceof Dvd){
-            PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO dvd (prod_number, format, " +
-                    "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
-            pStmt3.setString(1, product.getProdNumber());
-            pStmt3.setString(2, ((Dvd) product).getFormat());
-            pStmt3.setInt(3, ((Dvd) product).getDurationMinutes());
-            pStmt3.setShort(4, ((Dvd) product).getRegionCode());
-            pStmt3.executeUpdate();
+        } else if (product instanceof Dvd) {
+            this.persistDvd();
         }
     }
 
@@ -288,6 +294,16 @@ public class ProductHandler extends DefaultHandler {
             pStmt.setNull(3, Types.DATE);
         }
         pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+        pStmt.executeUpdate();
+    }
+
+    public void persistDvd() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO dvd (prod_number, format, " +
+                "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
+        pStmt.setString(1, product.getProdNumber());
+        pStmt.setString(2, ((Dvd) product).getFormat());
+        pStmt.setInt(3, ((Dvd) product).getDurationMinutes());
+        pStmt.setShort(4, ((Dvd) product).getRegionCode());
         pStmt.executeUpdate();
     }
 
