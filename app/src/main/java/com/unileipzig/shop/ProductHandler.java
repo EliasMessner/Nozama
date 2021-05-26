@@ -156,7 +156,7 @@ public class ProductHandler extends DefaultHandler {
                     break;
             }
         } else if (product instanceof Book){
-            switch(qName) {
+            switch (qName) {
                 case "publication":
                     if (!attributes.getValue("date").isBlank()) {
                         ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
@@ -174,6 +174,18 @@ public class ProductHandler extends DefaultHandler {
                     break;
                 case "author":
                     ((Book) product).getAuthors().add(new Person(attributes.getValue("name")));
+                    break;
+            }
+        } else if (product instanceof Dvd) {
+            switch (qName) {
+                case "actor":
+                    ((Dvd) product).getActors().add(new Person(attributes.getValue("name")));
+                    break;
+                case "creator":
+                    ((Dvd) product).getCreators().add(new Person(attributes.getValue("name")));
+                    break;
+                case "director":
+                    ((Dvd) product).getDirectors().add(new Person(attributes.getValue("name")));
                     break;
             }
         }
@@ -228,7 +240,7 @@ public class ProductHandler extends DefaultHandler {
 
     public void persistProduct() throws SQLException {
         PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
-                "sales_rank, image) VALUES (?, ?, 2.5, ?, ?)");
+                "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
         pStmt0.setString(1, product.getProdNumber());
         pStmt0.setString(2, product.getTitle());
         pStmt0.setInt(3, product.getSalesRank());
@@ -280,27 +292,49 @@ public class ProductHandler extends DefaultHandler {
     }
 
     public void persistPersonAndRelations() throws SQLException {
-        String productPersonTableName;
-        String columnNames;
-        List<Person> personList = new ArrayList<>();
-
         if (product instanceof MusicCd) {
-            productPersonTableName = "cd_artist";
-            columnNames = "(cd, artist)";
-            personList = ((MusicCd) product).getArtists();
+            this.persistPersonAndRelationsHelper("artist", ((MusicCd) product).getArtists());
         } else if (product instanceof Book) {
-            productPersonTableName = "book_author";
-            columnNames = "(book, author)";
-            personList = ((Book) product).getAuthors();
-        } else {
-            return;
+            this.persistPersonAndRelationsHelper("author", ((Book) product).getAuthors());
+        } else if (product instanceof Dvd){
+            this.persistPersonAndRelationsHelper("actor", ((Dvd) product).getActors());
+            this.persistPersonAndRelationsHelper("creator", ((Dvd) product).getCreators());
+            this.persistPersonAndRelationsHelper("director", ((Dvd) product).getDirectors());
         }
+    }
 
+    private void persistPersonAndRelationsHelper(String role, List<Person> personList) throws SQLException {
         PreparedStatement pStmt2 = conn.prepareStatement("SELECT id FROM person WHERE name = ?");
         PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)",
                 Statement.RETURN_GENERATED_KEYS);
-        PreparedStatement pStmtRelation = conn.prepareStatement("INSERT INTO " + productPersonTableName + " " +
-                columnNames + " VALUES (?, ?)");
+        PreparedStatement pStmtRelation;
+
+        switch(role) {
+            case "artist":
+                pStmtRelation = conn.prepareStatement("INSERT INTO cd_artist (cd, artist) " +
+                        "VALUES (?, ?)");
+                break;
+            case "author":
+                pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) " +
+                        "VALUES (?, ?)");
+                break;
+            case "actor":
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
+                        "VALUES (?, ?, 'actor')");
+                break;
+            case "creator":
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
+                        "VALUES (?, ?, 'creator')");
+                break;
+            case "director":
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
+                        "VALUES (?, ?, 'director')");
+                break;
+            default:
+                conn.rollback();
+                return;
+        }
+
         pStmtRelation.setString(1, product.getProdNumber());
 
         for (Person person: personList) {
