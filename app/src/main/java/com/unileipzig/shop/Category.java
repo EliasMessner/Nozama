@@ -7,6 +7,7 @@ public class Category {
     private ArrayList<Category> children;
     private Category parent;
     private ArrayList<String> items;
+    private int ID;
 
     public Category() {
         this.children = new ArrayList<>();
@@ -60,5 +61,13 @@ public class Category {
 
     private void setParent(Category parent) {
         this.parent = parent;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
     }
 }

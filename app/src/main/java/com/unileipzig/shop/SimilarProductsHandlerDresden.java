@@ -7,8 +7,8 @@ import java.sql.Connection;
 
 public class SimilarProductsHandlerDresden extends SimilarProductsHandler {
 
-    public SimilarProductsHandlerDresden(Connection conn) throws IOException {
-        super(conn);
+    public SimilarProductsHandlerDresden(Connection conn, String errorFilePath) throws IOException {
+        super(conn, errorFilePath);
     }
 
     @Override

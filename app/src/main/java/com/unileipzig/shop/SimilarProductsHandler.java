@@ -24,11 +24,11 @@ public abstract class SimilarProductsHandler extends DefaultHandler {
     protected PrintWriter printWriter;
     protected boolean isInSimilars;
 
-    public SimilarProductsHandler(Connection conn) throws IOException {
+    public SimilarProductsHandler(Connection conn, String errorFilePath) throws IOException {
         this.similarProducts = new HashMap<>();
         this.conn = conn;
         this.currentValue = new StringBuilder();
-        this.printWriter = new PrintWriter(new FileWriter("/data/errors.txt"));
+        this.printWriter = new PrintWriter(new FileWriter(errorFilePath));
         this.isInSimilars = false;
     }
 
@@ -79,10 +79,10 @@ public abstract class SimilarProductsHandler extends DefaultHandler {
     protected void writeToDatabase() {
         try {
             PreparedStatement pStmt = conn.prepareStatement("INSERT INTO similar_products (product1, product2) VALUES (?, ?)");
-            for (String product1 : similarProducts.keySet()) {
-                pStmt.setString(1, product1);
-                for (String product2 : similarProducts.get(product1)) {
-                    pStmt.setString(2, product2);
+            for (String prod_number1 : similarProducts.keySet()) {
+                pStmt.setString(1, prod_number1);
+                for (String prod_number2 : similarProducts.get(prod_number1)) {
+                    pStmt.setString(2, prod_number2);
                     pStmt.executeUpdate();
                 }
             }

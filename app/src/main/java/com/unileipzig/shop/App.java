@@ -2,14 +2,11 @@ package com.unileipzig.shop;
 
 import org.xml.sax.SAXException;
 
-import javax.xml.crypto.Data;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  * Hello world!
@@ -30,10 +27,14 @@ public class App
             SAXParser saxParser = factory.newSAXParser();
             ProductHandler productHandler = new ProductHandler(conn, "/data/errors.txt");
             ProductHandlerDresden productHandlerDresden = new ProductHandlerDresden(conn, "/data/errorsDresden.txt");
-            //CategoriesHandler categoriesHandler = new CategoriesHandler(conn);
+            CategoriesHandler categoriesHandler = new CategoriesHandler(conn, "/data/errorsCategories.txt");
+            SimilarProductsHandlerLeipzig similarProductsHandlerLeipzig = new SimilarProductsHandlerLeipzig(conn, "/data/errorsSimilarsLeipzig.txt");
+            SimilarProductsHandlerDresden similarProductsHandlerDresden = new SimilarProductsHandlerDresden(conn, "/data/errorsSimilasDresden.txt");
             saxParser.parse(FILENAME_LEIPZIG, productHandler);
             saxParser.parse(FILENAME_DRESDEN, productHandlerDresden);
-            //saxParser.parse(FILENAME_CATEGORIES, categoriesHandler);
+            saxParser.parse(FILENAME_CATEGORIES, categoriesHandler);
+            saxParser.parse(FILENAME_LEIPZIG, similarProductsHandlerLeipzig);
+            saxParser.parse(FILENAME_DRESDEN, similarProductsHandlerDresden);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
         }

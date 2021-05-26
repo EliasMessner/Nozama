@@ -7,9 +7,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,8 +22,8 @@ public class CategoriesHandler extends DefaultHandler {
     protected Connection conn;
     protected PrintWriter printWriter;
 
-    public CategoriesHandler(Connection conn) throws IOException {
-        this.printWriter = new PrintWriter(new FileWriter("/data/errors.txt"));
+    public CategoriesHandler(Connection conn, String errorPath) throws IOException {
+        this.printWriter = new PrintWriter(new FileWriter(errorPath));
         this.conn = conn;
     }
 
@@ -61,6 +59,7 @@ public class CategoriesHandler extends DefaultHandler {
                 addCategoryNameIfNotSet();
                 break;
         }
+        elementValue.setLength(0);
     }
 
     @Override
@@ -97,7 +96,7 @@ public class CategoriesHandler extends DefaultHandler {
 
     private void addCategoriesRecursively(Collection<Category> categories, Connection conn, Category parent) {
         for (Category category : categories) {
-            addCategoryIfNotExists(category, conn);
+            addCategoryAndSetID(category, conn);
             setSubCategory(parent, category, conn);
             for (String item : category.getItems()) {
                 addItemToCategory(item, category, conn);
@@ -106,11 +105,14 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
-    private void addCategoryIfNotExists(Category category, Connection conn) {
-        String insertQuery = "INSERT INTO category VALUES (?) ON CONFLICT DO NOTHING";
-        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+    private void addCategoryAndSetID(Category category, Connection conn) {
+        String insertQuery = "INSERT INTO category (name) VALUES (?)";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
             insertStmt.setString(1, category.getName());
             insertStmt.executeUpdate();
+            ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+            generatedKeys.next();
+            category.setID(generatedKeys.getInt(1));
         } catch (SQLException e) {
             e.printStackTrace();
             printWriter.println(e.getMessage());
@@ -122,7 +124,7 @@ public class CategoriesHandler extends DefaultHandler {
         String insertQuery = "INSERT INTO product_category (product, category) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
             insertStmt.setString(1, product_number);
-            insertStmt.setString(2, category.getName());
+            insertStmt.setInt(2, category.getID());
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -136,10 +138,10 @@ public class CategoriesHandler extends DefaultHandler {
         if (parent == null) {
             return true;
         }
-        String insertQuery = "INSERT INTO category_hierarchy (super_category, sub_category) VALUES (?, ?) ON CONFLICT (super_category, sub_category) DO NOTHING";
+        String insertQuery = "INSERT INTO category_hierarchy (super_category, sub_category) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-            insertStmt.setString(1, parent.getName());
-            insertStmt.setString(2, child.getName());
+            insertStmt.setInt(1, parent.getID());
+            insertStmt.setInt(2, child.getID());
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

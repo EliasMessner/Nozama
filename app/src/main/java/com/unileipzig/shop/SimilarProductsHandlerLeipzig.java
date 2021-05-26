@@ -9,8 +9,8 @@ public class SimilarProductsHandlerLeipzig extends SimilarProductsHandler {
 
     protected boolean isInSimProduct;
 
-    public SimilarProductsHandlerLeipzig(Connection conn) throws IOException {
-        super(conn);
+    public SimilarProductsHandlerLeipzig(Connection conn, String errorFilePath) throws IOException {
+        super(conn, errorFilePath);
         isInSimProduct = false;
     }
 
