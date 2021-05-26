@@ -1,6 +1,6 @@
 package com.unileipzig.shop;
 
-public abstract class Product {
+public class Product {
 
     String prodNumber;
     String title;

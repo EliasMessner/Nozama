@@ -251,21 +251,54 @@ public class ProductHandler extends DefaultHandler {
     }
 
     public void persistProduct() throws SQLException {
-        PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
-                "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
-        pStmt0.setString(1, product.getProdNumber());
-        pStmt0.setString(2, product.getTitle());
-        pStmt0.setInt(3, product.getSalesRank());
-        pStmt0.setString(4, product.getImage());
-        pStmt0.executeUpdate();
-
-        if (product instanceof MusicCd) {
+        if (!productExists()) {
+            PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
+                    "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
+            pStmt0.setString(1, product.getProdNumber());
+            pStmt0.setString(2, product.getTitle());
+            pStmt0.setInt(3, product.getSalesRank());
+            pStmt0.setString(4, product.getImage());
+            pStmt0.executeUpdate();
+        }
+        if (product instanceof MusicCd && !musicCdExists()) {
             this.persistMusicCd();
-        } else if (product instanceof Book) {
+        } else if (product instanceof Book && !bookExists()) {
             this.persistBook();
-        } else if (product instanceof Dvd) {
+        } else if (product instanceof Dvd && !dvdExists()) {
             this.persistDvd();
         }
+    }
+
+    private boolean productExists() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("SELECT FROM product WHERE prod_number = ?");
+        pStmt.setString(1, product.getProdNumber());
+        ResultSet resultSet = pStmt.executeQuery();
+        Product other = getProductFromResultSet(resultSet);
+        return product.equals(other);
+    }
+
+    private Product getProductFromResultSet(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            Product product = new Product(resultSet.getString("prod_number"),
+                    resultSet.getString("title"));
+            product.setRating(resultSet.getDouble("rating"));
+            product.setSalesRank(resultSet.getInt("sales_rank"));
+            product.setImage(resultSet.getString("image"));
+            return product;
+        }
+        return null;
+    }
+
+    private boolean dvdExists() {
+        return false; //TODO
+    }
+
+    private boolean bookExists() {
+        return false; //TODO
+    }
+
+    private boolean musicCdExists() {
+        return false; //TODO
     }
 
     public void persistBook() throws SQLException {
