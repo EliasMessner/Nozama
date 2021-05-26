@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProductHandler extends DefaultHandler {
 
@@ -23,9 +24,17 @@ public class ProductHandler extends DefaultHandler {
     protected Shop shop;
     protected Connection conn;
 
-    public ProductHandler(Connection conn) {
+    public ProductHandler(Connection conn, String errorPath) throws IOException {
         super();
         this.conn = conn;
+
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(errorPath);
+            printWriter = new PrintWriter(fileWriter);
+        } catch (IOException e) {
+            throw new IOException(e);
+        }
     }
 
     @Override
@@ -33,14 +42,6 @@ public class ProductHandler extends DefaultHandler {
         super.startDocument();
 
         System.out.println("Start Document");
-
-        FileWriter fileWriter = null;
-        try {
-            fileWriter = new FileWriter("/data/errors.txt");
-            printWriter = new PrintWriter(fileWriter);
-        } catch (IOException e) {
-            throw new SAXException(e);
-        }
     }
 
     @Override
@@ -117,6 +118,7 @@ public class ProductHandler extends DefaultHandler {
         } else if (qName.equals("item") && !similars) {
             try {
                 this.persistProduct();
+                this.persistPersonAndRelations();
             } catch (SQLException throwables) {
                 printWriter.println(throwables.getMessage());
                 throwables.printStackTrace();
@@ -149,9 +151,12 @@ public class ProductHandler extends DefaultHandler {
                         ((MusicCd) product).getLabels().add(attributes.getValue("name"));
                     }
                     break;
+                case "artist":
+                    ((MusicCd) product).getArtists().add(new Person(attributes.getValue("name")));
+                    break;
             }
         } else if (product instanceof Book){
-            switch(qName) {
+            switch (qName) {
                 case "publication":
                     if (!attributes.getValue("date").isBlank()) {
                         ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
@@ -166,6 +171,21 @@ public class ProductHandler extends DefaultHandler {
                     if (publisherIsAttribute && !attributes.getValue("name").isBlank()) {
                         ((Book) product).getPublishers().add(attributes.getValue("name"));
                     }
+                    break;
+                case "author":
+                    ((Book) product).getAuthors().add(new Person(attributes.getValue("name")));
+                    break;
+            }
+        } else if (product instanceof Dvd) {
+            switch (qName) {
+                case "actor":
+                    ((Dvd) product).getActors().add(new Person(attributes.getValue("name")));
+                    break;
+                case "creator":
+                    ((Dvd) product).getCreators().add(new Person(attributes.getValue("name")));
+                    break;
+                case "director":
+                    ((Dvd) product).getDirectors().add(new Person(attributes.getValue("name")));
                     break;
             }
         }
@@ -220,7 +240,7 @@ public class ProductHandler extends DefaultHandler {
 
     public void persistProduct() throws SQLException {
         PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
-                "sales_rank, image) VALUES (?, ?, 2.5, ?, ?)");
+                "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
         pStmt0.setString(1, product.getProdNumber());
         pStmt0.setString(2, product.getTitle());
         pStmt0.setInt(3, product.getSalesRank());
@@ -228,30 +248,9 @@ public class ProductHandler extends DefaultHandler {
         pStmt0.executeUpdate();
 
         if (product instanceof MusicCd) {
-            PreparedStatement pStmt1 = conn.prepareStatement("INSERT INTO music_cd (prod_number, labels, " +
-                    "publication_date, titles) VALUES (?, ?, ?, ?)");
-            pStmt1.setString(1, product.getProdNumber());
-            pStmt1.setArray(2, conn.createArrayOf("VARCHAR", ((MusicCd) product).getLabels().toArray()));
-            if (((MusicCd) product).getPublicationDate() != null) {
-                pStmt1.setDate(3, Date.valueOf(((MusicCd) product).getPublicationDate()));
-            } else {
-                pStmt1.setNull(3, Types.DATE);
-            }
-            pStmt1.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
-            pStmt1.executeUpdate();
+            this.persistMusicCd();
         } else if (product instanceof Book) {
-            PreparedStatement pStmt2 = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
-                    "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
-            pStmt2.setString(1, product.getProdNumber());
-            pStmt2.setInt(2, ((Book) product).getPageNumber());
-            if (((Book) product).getPublicationDate() != null) {
-                pStmt2.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
-            } else {
-                pStmt2.setNull(3, Types.DATE);
-            }
-            pStmt2.setString(4, ((Book) product).getIsbn());
-            pStmt2.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
-            pStmt2.executeUpdate();
+            this.persistBook();
         } else if (product instanceof Dvd){
             PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO dvd (prod_number, format, " +
                     "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
@@ -260,6 +259,101 @@ public class ProductHandler extends DefaultHandler {
             pStmt3.setInt(3, ((Dvd) product).getDurationMinutes());
             pStmt3.setShort(4, ((Dvd) product).getRegionCode());
             pStmt3.executeUpdate();
+        }
+    }
+
+    public void persistBook() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
+                "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
+        pStmt.setString(1, product.getProdNumber());
+        pStmt.setInt(2, ((Book) product).getPageNumber());
+        if (((Book) product).getPublicationDate() != null) {
+            pStmt.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
+        } else {
+            pStmt.setNull(3, Types.DATE);
+        }
+        pStmt.setString(4, ((Book) product).getIsbn());
+        pStmt.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
+        pStmt.executeUpdate();
+    }
+
+    public void persistMusicCd() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO music_cd (prod_number, labels, " +
+                "publication_date, titles) VALUES (?, ?, ?, ?)");
+        pStmt.setString(1, product.getProdNumber());
+        pStmt.setArray(2, conn.createArrayOf("VARCHAR", ((MusicCd) product).getLabels().toArray()));
+        if (((MusicCd) product).getPublicationDate() != null) {
+            pStmt.setDate(3, Date.valueOf(((MusicCd) product).getPublicationDate()));
+        } else {
+            pStmt.setNull(3, Types.DATE);
+        }
+        pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+        pStmt.executeUpdate();
+    }
+
+    public void persistPersonAndRelations() throws SQLException {
+        if (product instanceof MusicCd) {
+            this.persistPersonAndRelationsHelper("artist", ((MusicCd) product).getArtists());
+        } else if (product instanceof Book) {
+            this.persistPersonAndRelationsHelper("author", ((Book) product).getAuthors());
+        } else if (product instanceof Dvd){
+            this.persistPersonAndRelationsHelper("actor", ((Dvd) product).getActors());
+            this.persistPersonAndRelationsHelper("creator", ((Dvd) product).getCreators());
+            this.persistPersonAndRelationsHelper("director", ((Dvd) product).getDirectors());
+        }
+    }
+
+    private void persistPersonAndRelationsHelper(String role, List<Person> personList) throws SQLException {
+        PreparedStatement pStmt2 = conn.prepareStatement("SELECT id FROM person WHERE name = ?");
+        PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)",
+                Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement pStmtRelation;
+
+        switch(role) {
+            case "artist":
+                pStmtRelation = conn.prepareStatement("INSERT INTO cd_artist (cd, artist) " +
+                        "VALUES (?, ?)");
+                break;
+            case "author":
+                pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) " +
+                        "VALUES (?, ?)");
+                break;
+            case "actor":
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
+                        "VALUES (?, ?, 'actor')");
+                break;
+            case "creator":
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
+                        "VALUES (?, ?, 'creator')");
+                break;
+            case "director":
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
+                        "VALUES (?, ?, 'director')");
+                break;
+            default:
+                conn.rollback();
+                return;
+        }
+
+        pStmtRelation.setString(1, product.getProdNumber());
+
+        for (Person person: personList) {
+            pStmt2.setString(1, person.getName());
+            ResultSet personIds = pStmt2.executeQuery();
+
+            int personId;
+            if (personIds.next()) {
+                personId = personIds.getInt(1);
+            } else {
+                pStmt3.setString(1, person.getName());
+                pStmt3.executeUpdate();
+                ResultSet generatedKeys = pStmt3.getGeneratedKeys();
+                generatedKeys.next();
+                personId = generatedKeys.getInt(1);
+            }
+
+            pStmtRelation.setInt(2, personId);
+            pStmtRelation.executeUpdate();
         }
     }
 }

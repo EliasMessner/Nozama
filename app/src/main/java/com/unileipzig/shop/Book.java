@@ -12,11 +12,13 @@ public class Book extends Product {
     private LocalDate publicationDate;
     private String isbn;
     private List<String> publishers;
+    private List<Person> authors;
 
     Book(String prodNumber, String title) {
         super(prodNumber, title);
 
         publishers = new ArrayList<>();
+        authors = new ArrayList<>();
     }
 
     public int getPageNumber() {
@@ -53,5 +55,13 @@ public class Book extends Product {
 
     public void addPublisher(String publisher) {
         this.publishers.add(publisher);
+    }
+
+    public List<Person> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(List<Person> authors) {
+        this.authors = authors;
     }
 }

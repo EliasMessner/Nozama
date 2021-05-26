@@ -25,11 +25,11 @@ public class App
     public static void main( String[] args )
     {
         SAXParserFactory factory = SAXParserFactory.newInstance();
-        Connection conn = DatabaseConnector.getConnection("test_elias");
+        Connection conn = DatabaseConnector.getConnection("test_1");
         try {
             SAXParser saxParser = factory.newSAXParser();
-            ProductHandler productHandler = new ProductHandler(conn);
-            ProductHandlerDresden productHandlerDresden = new ProductHandlerDresden(conn);
+            ProductHandler productHandler = new ProductHandler(conn, "/data/errors.txt");
+            ProductHandlerDresden productHandlerDresden = new ProductHandlerDresden(conn, "/data/errorsDresden.txt");
             //CategoriesHandler categoriesHandler = new CategoriesHandler(conn);
             saxParser.parse(FILENAME_LEIPZIG, productHandler);
             saxParser.parse(FILENAME_DRESDEN, productHandlerDresden);

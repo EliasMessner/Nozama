@@ -3,12 +3,13 @@ package com.unileipzig.shop;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
+import java.io.IOException;
 import java.sql.Connection;
 
 public class ProductHandlerDresden extends ProductHandler {
 
-    public ProductHandlerDresden(Connection conn) {
-        super(conn);
+    public ProductHandlerDresden(Connection conn, String errorPath) throws IOException {
+        super(conn, errorPath);
     }
 
     @Override
