@@ -1,6 +1,6 @@
 CREATE TABLE person(
     id SERIAL PRIMARY KEY,
-    name VARCHAR
+    name VARCHAR NOT NULL
 );
 
 CREATE TABLE product(
@@ -23,7 +23,7 @@ CREATE TABLE dvd(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     format VARCHAR,
     duration_minutes INT,
-    region_code SMALLINT
+    region_code SMALLINT NOT NULL
 );
 
 CREATE TABLE music_cd(
@@ -54,7 +54,7 @@ CREATE TABLE cd_artist(
 
 CREATE TABLE category(
     id SERIAL PRIMARY KEY,
-    name VARCHAR
+    name VARCHAR NOT NULL
 );
 
 CREATE TABLE category_hierarchy(
