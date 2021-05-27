@@ -53,17 +53,18 @@ CREATE TABLE cd_artist(
 );
 
 CREATE TABLE category(
-    name VARCHAR PRIMARY KEY
+    id SERIAL PRIMARY KEY,
+    name VARCHAR
 );
 
 CREATE TABLE category_hierarchy(
-    super_category VARCHAR REFERENCES category(name),
-    sub_category VARCHAR REFERENCES category(name),
+    super_category INT REFERENCES category(id),
+    sub_category INT REFERENCES category(id),
     PRIMARY KEY(super_category, sub_category)
 );
 
 CREATE TABLE product_category(
     product VARCHAR REFERENCES product(prod_number),
-    category VARCHAR REFERENCES category(name),
+    category INT REFERENCES category(id),
     PRIMARY KEY(product,category)
 );

@@ -4,23 +4,26 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class CategoriesHandler extends DefaultHandler {
-    private static final String CATEGORIES = "categories";
-    private static final String CATEGORY = "category";
-    private static final String ITEM = "item";
+    protected static final String CATEGORIES = "categories";
+    protected static final String CATEGORY = "category";
+    protected static final String ITEM = "item";
 
-    private StringBuilder elementValue;
-    private ArrayList<Category> categories;
-    private Category current = null;
-    private Connection conn;
+    protected StringBuilder elementValue;
+    protected ArrayList<Category> categories;
+    protected Category current = null;
+    protected Connection conn;
+    protected PrintWriter printWriter;
 
-    public CategoriesHandler(Connection conn) {
+    public CategoriesHandler(Connection conn, String errorPath) throws IOException {
+        this.printWriter = new PrintWriter(new FileWriter(errorPath));
         this.conn = conn;
     }
 
@@ -42,9 +45,6 @@ public class CategoriesHandler extends DefaultHandler {
     @Override
     public void startElement(String uri, String lName, String qName, Attributes attr) throws SAXException {
         switch (qName) {
-            case CATEGORIES:
-
-                break;
             case CATEGORY:
                 addCategoryNameIfNotSet();
                 Category c = new Category();
@@ -59,6 +59,7 @@ public class CategoriesHandler extends DefaultHandler {
                 addCategoryNameIfNotSet();
                 break;
         }
+        elementValue.setLength(0);
     }
 
     @Override
@@ -79,6 +80,7 @@ public class CategoriesHandler extends DefaultHandler {
     public void endDocument() throws SAXException {
         super.endDocument();
         writeToDataBase();
+        printWriter.close();
     }
 
     private void addCategoryNameIfNotSet() {
@@ -94,7 +96,7 @@ public class CategoriesHandler extends DefaultHandler {
 
     private void addCategoriesRecursively(Collection<Category> categories, Connection conn, Category parent) {
         for (Category category : categories) {
-            addCategoryIfNotExists(category, conn);
+            addCategoryAndSetID(category, conn);
             setSubCategory(parent, category, conn);
             for (String item : category.getItems()) {
                 addItemToCategory(item, category, conn);
@@ -103,33 +105,30 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
-    private void addCategoryIfNotExists(Category category, Connection conn) {
-        String insertQuery = "INSERT INTO category VALUES (?) ON CONFLICT DO NOTHING";
-        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+    private void addCategoryAndSetID(Category category, Connection conn) {
+        String insertQuery = "INSERT INTO category (name) VALUES (?)";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
             insertStmt.setString(1, category.getName());
             insertStmt.executeUpdate();
+            ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+            generatedKeys.next();
+            category.setID(generatedKeys.getInt(1));
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO handle SQL Exception
+            printWriter.println(e.getMessage());
         }
 
     }
 
-    private boolean addItemToCategory(String prod_num_str, Category category, Connection conn) {
-        String response = checkProductNumber(prod_num_str);
-        if (!response.equals("OK")) {
-            // TODO handle bad response
-            return false;
-        }
-        int product_number = Integer.parseInt(prod_num_str);
+    private boolean addItemToCategory(String product_number, Category category, Connection conn) {
         String insertQuery = "INSERT INTO product_category (product, category) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-            insertStmt.setInt(1, product_number);
-            insertStmt.setString(2, category.getName());
+            insertStmt.setString(1, product_number);
+            insertStmt.setInt(2, category.getID());
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO handle SQL Exception
+            printWriter.println(e.getMessage());
             return false;
         }
         return true;
@@ -139,25 +138,16 @@ public class CategoriesHandler extends DefaultHandler {
         if (parent == null) {
             return true;
         }
-        String insertQuery = "INSERT INTO category_hierarchy (super_category, sub_category) VALUES (?, ?) ON CONFLICT (super_category, sub_category) DO NOTHING";
+        String insertQuery = "INSERT INTO category_hierarchy (super_category, sub_category) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-            insertStmt.setString(1, parent.getName());
-            insertStmt.setString(2, child.getName());
+            insertStmt.setInt(1, parent.getID());
+            insertStmt.setInt(2, child.getID());
             insertStmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
-            //TODO handle SQL Exception
+            printWriter.println(e.getMessage());
             return false;
         }
         return true;
-    }
-
-    private String checkProductNumber(String prod_num_str) {
-        try {
-            Integer.parseInt(prod_num_str);
-        } catch (NumberFormatException e) {
-            return e.getMessage();
-        }
-        return "OK";
     }
 }
