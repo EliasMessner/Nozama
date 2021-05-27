@@ -279,7 +279,6 @@ public abstract class ProductHandler extends DefaultHandler {
         pStmt.executeUpdate();
     }
 
-
     private boolean productExists() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM product WHERE prod_number = ?");
         pStmt.setString(1, product.getProdNumber());
