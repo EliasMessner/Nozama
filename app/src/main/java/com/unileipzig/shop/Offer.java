@@ -12,6 +12,7 @@ public class Offer {
 
     Offer(Product product, Shop shop) {
         this.product = product;
+        this.shop = shop;
     }
 
     public int getArtId() {

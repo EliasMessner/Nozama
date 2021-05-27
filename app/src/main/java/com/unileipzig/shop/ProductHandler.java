@@ -4,15 +4,12 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.crypto.Data;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.sql.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class ProductHandler extends DefaultHandler {
@@ -127,6 +124,7 @@ public class ProductHandler extends DefaultHandler {
                 conn.setAutoCommit(false);
                 this.persistProduct();
                 this.persistPersonAndRelations();
+                this.persistOffer();
                 conn.commit();
             } catch (SQLException throwables) {
                 try {
@@ -266,6 +264,7 @@ public class ProductHandler extends DefaultHandler {
     public void persistProduct() throws SQLException {
         PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
                 "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
+
         pStmt0.setString(1, product.getProdNumber());
         pStmt0.setString(2, product.getTitle());
         pStmt0.setInt(3, product.getSalesRank());
@@ -284,6 +283,7 @@ public class ProductHandler extends DefaultHandler {
     public void persistBook() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
                 "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
+
         pStmt.setString(1, product.getProdNumber());
         pStmt.setInt(2, ((Book) product).getPageNumber());
         if (((Book) product).getPublicationDate() != null) {
@@ -293,12 +293,14 @@ public class ProductHandler extends DefaultHandler {
         }
         pStmt.setString(4, ((Book) product).getIsbn());
         pStmt.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
+
         pStmt.executeUpdate();
     }
 
     public void persistMusicCd() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO music_cd (prod_number, labels, " +
                 "publication_date, titles) VALUES (?, ?, ?, ?)");
+
         pStmt.setString(1, product.getProdNumber());
         pStmt.setArray(2, conn.createArrayOf("VARCHAR", ((MusicCd) product).getLabels().toArray()));
         if (((MusicCd) product).getPublicationDate() != null) {
@@ -307,16 +309,19 @@ public class ProductHandler extends DefaultHandler {
             pStmt.setNull(3, Types.DATE);
         }
         pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+
         pStmt.executeUpdate();
     }
 
     public void persistDvd() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO dvd (prod_number, format, " +
                 "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
+
         pStmt.setString(1, product.getProdNumber());
         pStmt.setString(2, ((Dvd) product).getFormat());
         pStmt.setInt(3, ((Dvd) product).getDurationMinutes());
         pStmt.setShort(4, ((Dvd) product).getRegionCode());
+
         pStmt.executeUpdate();
     }
 
@@ -384,5 +389,19 @@ public class ProductHandler extends DefaultHandler {
             pStmtRelation.setInt(2, personId);
             pStmtRelation.executeUpdate();
         }
+    }
+
+    public void persistOffer() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store_inventory (product, " +
+                "store_name, store_street, store_zip, article_condition, price) VALUES (?, ?, ?, ?, ?, ?)");
+
+        pStmt.setString(1, offer.getProduct().getProdNumber());
+        pStmt.setString(2, offer.getShop().getName());
+        pStmt.setString(3, offer.getShop().getStreet());
+        pStmt.setInt(4, offer.getShop().getZip());
+        pStmt.setString(5, offer.getArticleCondition());
+        pStmt.setBigDecimal(6, offer.getPrice());
+
+        pStmt.executeUpdate();
     }
 }
