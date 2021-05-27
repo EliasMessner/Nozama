@@ -25,12 +25,12 @@ public class App
         Connection conn = DatabaseConnector.getConnection("test_1");
         try {
             SAXParser saxParser = factory.newSAXParser();
-            ProductHandler productHandler = new ProductHandler(conn, "/data/errors.txt");
+            ProductHandlerLeipzig productHandlerLeipzig = new ProductHandlerLeipzig(conn, "/data/errorsLeipzig.txt");
             ProductHandlerDresden productHandlerDresden = new ProductHandlerDresden(conn, "/data/errorsDresden.txt");
             CategoriesHandler categoriesHandler = new CategoriesHandler(conn, "/data/errorsCategories.txt");
             SimilarProductsHandlerLeipzig similarProductsHandlerLeipzig = new SimilarProductsHandlerLeipzig(conn, "/data/errorsSimilarsLeipzig.txt");
             SimilarProductsHandlerDresden similarProductsHandlerDresden = new SimilarProductsHandlerDresden(conn, "/data/errorsSimilasDresden.txt");
-            saxParser.parse(FILENAME_LEIPZIG, productHandler);
+            saxParser.parse(FILENAME_LEIPZIG, productHandlerLeipzig);
             saxParser.parse(FILENAME_DRESDEN, productHandlerDresden);
             saxParser.parse(FILENAME_CATEGORIES, categoriesHandler);
             saxParser.parse(FILENAME_LEIPZIG, similarProductsHandlerLeipzig);

@@ -7,16 +7,19 @@ import org.xml.sax.helpers.DefaultHandler;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class ProductHandler extends DefaultHandler {
+public abstract class ProductHandler extends DefaultHandler {
 
     protected StringBuilder currentValue = new StringBuilder();
     protected Product product;
+    protected Offer offer;
     protected boolean tracks = false;
     protected boolean similars = false;
     protected PrintWriter printWriter;
@@ -26,8 +29,7 @@ public class ProductHandler extends DefaultHandler {
     public ProductHandler(Connection conn, String errorPath) throws IOException {
         super();
         this.conn = conn;
-
-        FileWriter fileWriter = null;
+        FileWriter fileWriter;
         try {
             fileWriter = new FileWriter(errorPath);
             printWriter = new PrintWriter(fileWriter);
@@ -38,197 +40,202 @@ public class ProductHandler extends DefaultHandler {
 
     @Override
     public void startDocument() throws SAXException {
-        super.startDocument();
-
         System.out.println("Start Document");
     }
 
     @Override
     public void endDocument() throws SAXException {
-        super.endDocument();
-
         System.out.println("End Document");
-
         printWriter.close();
-    }
-
-    @Override
-    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        startElement(uri, localName, qName, attributes, true, true, true);
-    }
-
-    public void startElement(String uri, String localName, String qName, Attributes attributes, boolean imgIsAttribute, boolean publisherIsAttribute, boolean labelIsAttribute) throws SAXException {
-        super.startElement(uri, localName, qName, attributes);
-
-        currentValue.setLength(0);
-
-        //System.out.printf("Start Element : %s%n", qName);
-        if (qName.equals("shop")) {
-            shop = new Shop(attributes.getValue("name"),
-                    attributes.getValue("street"),
-                    Integer.parseInt(attributes.getValue("zip")));
-        }
-        if (qName.equals("item") && !similars) {
-            System.out.println("Current item: " + attributes.getValue("asin"));
-
-            switch (attributes.getValue("pgroup")){
-                case "Music":
-                    product = new MusicCd(attributes.getValue("asin"), null);
-                    break;
-                case "Book":
-                case "Buch":
-                    product = new Book(attributes.getValue("asin"), null);
-                    break;
-                case "DVD":
-                    product = new Dvd(attributes.getValue("asin"), null);
-                    break;
-                default:
-                    printWriter.println("ERROR: product type " + attributes.getValue("pgroup") + " does not exist.");
-            }
-
-            if (!attributes.getValue("salesrank").isBlank()) {
-                product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
-            }
-
-            if (imgIsAttribute) {
-                product.setImage(attributes.getValue("picture"));
-            }
-        } else if (qName.equals("tracks")) {
-            tracks = true;
-        } else if (qName.equals("similars")) {
-            similars = true;
-        }
-
-        this.readProductAttributes(uri, localName, qName, attributes, publisherIsAttribute, labelIsAttribute);
-    }
-
-    @Override
-    public void endElement(String uri, String localName, String qName) throws SAXException {
-        super.endElement(uri, localName, qName);
-
-        //System.out.printf("End Element : %s%n", qName);
-        try {
-            if (qName.equals("shop")) {
-                persistShop();
-            } else if (qName.equals("item") && !similars) {
-                try {
-                    conn.setAutoCommit(false);
-                    this.persistProduct();
-                    this.persistPersonAndRelations();
-                    conn.commit();
-                } catch (SQLException throwables) {
-                    conn.rollback();
-                    throwables.printStackTrace();
-                    printWriter.println(throwables.getMessage());
-                } finally {
-                    conn.setAutoCommit(true);
-                }
-            } else if (qName.equals("tracks")) {
-                tracks = false;
-            } else if (qName.equals("similars")) {
-                similars = false;
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        if (currentValue.toString().isBlank()) {
-            return;
-        }
-
-        this.readProductTextElements(uri, localName, qName);
     }
 
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         super.characters(ch, start, length);
-
         currentValue.append(ch, start, length);
     }
 
-    public void readProductAttributes(String uri, String localName, String qName, Attributes attributes, boolean publisherIsAttribute, boolean labelIsAttribute) throws SAXException {
-        if (product instanceof MusicCd){
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        currentValue.setLength(0);
+        switch (qName) {
+            case "shop":
+                parseShop(attributes);
+                break;
+            case "item":
+                startItemTag(attributes);
+                break;
+            case "tracks":
+                tracks = true;
+                break;
+            case "similars":
+                similars = true;
+                break;
+            case "price":
+                offer.setArticleCondition(attributes.getValue("state"));
+            default:
+                startTagDefaultCase();
+                break;
+        }
+        readProductAttributes(qName, attributes);
+    }
+
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        try {
             switch (qName) {
-                case "label":
-                    if (labelIsAttribute && !attributes.getValue("name").isBlank()) {
-                        ((MusicCd) product).addLabel(attributes.getValue("name"));
-                    }
+                case "shop":
+                    persistShop();
                     break;
-                case "artist":
-                    ((MusicCd) product).addArtist(new Person(attributes.getValue("name")));
+                case "item":
+                    endItemTag();
                     break;
+                case "tracks":
+                    tracks = false;
+                    break;
+                case "similars":
+                    similars = false;
+                    break;
+                case "price":
+                    offer.setPrice(parsePrice());
             }
-        } else if (product instanceof Book){
-            switch (qName) {
-                case "publication":
-                    if (!attributes.getValue("date").isBlank()) {
-                        ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
-                    }
-                    break;
-                case "isbn":
-                    if (!attributes.getValue("val").isBlank()) {
-                        ((Book) product).setIsbn(attributes.getValue("val"));
-                    }
-                    break;
-                case "publisher":
-                    if (publisherIsAttribute && !attributes.getValue("name").isBlank()) {
-                        ((Book) product).addPublisher(attributes.getValue("name"));
-                    }
-                    break;
-                case "author":
-                    ((Book) product).addAuthor(new Person(attributes.getValue("name")));
-                    break;
-            }
-        } else if (product instanceof Dvd) {
-            switch (qName) {
-                case "actor":
-                    ((Dvd) product).addActor(new Person(attributes.getValue("name")));
-                    break;
-                case "creator":
-                    ((Dvd) product).addCreator(new Person(attributes.getValue("name")));
-                    break;
-                case "director":
-                    ((Dvd) product).addDirector(new Person(attributes.getValue("name")));
-                    break;
-            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        this.readProductTextElements(uri, localName, qName);
+    }
+
+    protected BigDecimal parsePrice() {
+        if (currentValue.toString().isBlank())
+            return null;
+        BigDecimal price100 = new BigDecimal(currentValue.toString());
+        return price100.divide(new BigDecimal("100"), RoundingMode.HALF_UP);
+    }
+
+    protected void parseShop(Attributes attributes) {
+        shop = new Shop(attributes.getValue("name"),
+                attributes.getValue("street"),
+                Integer.parseInt(attributes.getValue("zip")));
+    }
+
+    protected void startTagDefaultCase() {
+        //TODO maybe count occurrences of tags to find syntax errors
+    }
+
+    protected void startItemTag(Attributes attributes) {
+        if (similars) return;
+        System.out.println("Current item: " + attributes.getValue("asin"));
+        switch (attributes.getValue("pgroup")){
+            case "Music":
+                product = new MusicCd(attributes.getValue("asin"), null);
+                break;
+            case "Book":
+            case "Buch":
+                product = new Book(attributes.getValue("asin"), null);
+                break;
+            case "DVD":
+                product = new Dvd(attributes.getValue("asin"), null);
+                break;
+            default:
+                printWriter.println("ERROR: product type " + attributes.getValue("pgroup") + " does not exist.");
+        }
+        if (!attributes.getValue("salesrank").isBlank()) {
+            product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
+        }
+        offer = new Offer(product, shop);
+    }
+
+    protected void endItemTag() throws SQLException {
+        if (similars) return;
+        try {
+            conn.setAutoCommit(false);
+            this.persistProduct();
+            this.persistPersonAndRelations();
+            this.persistOffer();
+            conn.commit();
+        } catch (SQLException throwables) {
+            conn.rollback();
+            throwables.printStackTrace();
+            printWriter.println(throwables.getMessage());
+        } finally {
+            conn.setAutoCommit(true);
         }
     }
 
-    public void readProductTextElements(String uri, String localName, String qName) throws SAXException {
+    public void readProductAttributes(String qName, Attributes attributes) throws SAXException {
+        if (product instanceof MusicCd){
+            readMusicCdAttributes(qName, attributes);
+        } else if (product instanceof Book){
+            readBookAttributes(qName, attributes);
+        } else if (product instanceof Dvd) {
+            readDvdAttributes(qName, attributes);
+        }
+    }
+
+    protected void readDvdAttributes(String qName, Attributes attributes) {
+
+    }
+
+    protected void readBookAttributes(String qName, Attributes attributes) {
+        switch (qName) {
+            case "publication":
+                if (!attributes.getValue("date").isBlank())
+                    ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
+                break;
+            case "isbn":
+                if (!attributes.getValue("val").isBlank())
+                    ((Book) product).setIsbn(attributes.getValue("val"));
+                break;
+        }
+    }
+
+    protected void readMusicCdAttributes(String qName, Attributes attributes) {
+
+    }
+
+    protected void readProductTextElements(String uri, String localName, String qName) throws SAXException {
+        if (currentValue.toString().isBlank()) return;
         if (qName.equals("title") && !tracks && !similars) {
             product.setTitle(currentValue.toString());
             return;
         }
         if (product instanceof MusicCd) {
-            switch (qName) {
-                case "releasedate":
-                    ((MusicCd) product).setPublicationDate(LocalDate.parse(currentValue.toString()));
-                    break;
-                case "title":
-                    ((MusicCd) product).addTitle(currentValue.toString());
-                    break;
-            }
+            readMusicCdTextElements(qName);
         } else if (product instanceof Book) {
-            switch (qName) {
-                case "pages":
-                    ((Book) product).setPageNumber(Integer.parseInt(currentValue.toString()));
-                    break;
-                case "releasedate":
-                    ((MusicCd) product).setPublicationDate(LocalDate.parse(currentValue.toString()));
-                    break;
-            }
+            readBookTextElements(qName);
         } else if (product instanceof Dvd) {
-            switch (qName) {
-                case "format":
-                    ((Dvd) product).setFormat(currentValue.toString());
-                    break;
-                case "runningtime":
-                    ((Dvd) product).setDurationMinutes(Integer.parseInt(currentValue.toString()));
-                    break;
-                case "regioncode":
-                    ((Dvd) product).setRegionCode(Short.parseShort(currentValue.toString()));
-                    break;
-            }
+            readDvdTextElements(qName);
+        }
+    }
+
+    protected void readDvdTextElements(String qName) {
+        switch (qName) {
+            case "format":
+                ((Dvd) product).setFormat(currentValue.toString());
+                break;
+            case "runningtime":
+                ((Dvd) product).setDurationMinutes(Integer.parseInt(currentValue.toString()));
+                break;
+            case "regioncode":
+                ((Dvd) product).setRegionCode(Short.parseShort(currentValue.toString()));
+                break;
+        }
+    }
+
+    protected void readBookTextElements(String qName) {
+        if ("pages".equals(qName)) {
+            ((Book) product).setPageNumber(Integer.parseInt(currentValue.toString()));
+        }
+    }
+
+    protected void readMusicCdTextElements(String qName) {
+        switch (qName) {
+            case "releasedate":
+                ((MusicCd) product).setPublicationDate(currentValue.toString().isBlank() ? null : LocalDate.parse(currentValue.toString()));
+                break;
+            case "title":
+                if (tracks) ((MusicCd) product).addTitle(currentValue.toString());
+                break;
         }
     }
 
@@ -259,6 +266,19 @@ public class ProductHandler extends DefaultHandler {
             this.persistDvd();
         }
     }
+
+    public void persistOffer() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store_inventory (product, " +
+                "store_name, store_street, store_zip, article_condition, price) VALUES (?, ?, ?, ?, ?, ?)");
+        pStmt.setString(1, offer.getProduct().getProdNumber());
+        pStmt.setString(2, offer.getShop().getName());
+        pStmt.setString(3, offer.getShop().getStreet());
+        pStmt.setInt(4, offer.getShop().getZip());
+        pStmt.setString(5, offer.getArticleCondition());
+        pStmt.setBigDecimal(6, offer.getPrice());
+        pStmt.executeUpdate();
+    }
+
 
     private boolean productExists() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM product WHERE prod_number = ?");
@@ -411,8 +431,28 @@ public class ProductHandler extends DefaultHandler {
         PreparedStatement pStmt2 = conn.prepareStatement("SELECT id FROM person WHERE name = ?");
         PreparedStatement pStmt3 = conn.prepareStatement("INSERT INTO person (name) VALUES (?)",
                 Statement.RETURN_GENERATED_KEYS);
-        PreparedStatement pStmtRelation;
+        PreparedStatement pStmtRelation = prepareRelationStatement(role);
+        if (pStmtRelation == null) return;
+        for (Person person: personList) {
+            pStmt2.setString(1, person.getName());
+            ResultSet personIds = pStmt2.executeQuery();
+            int personId;
+            if (personIds.next()) {
+                personId = personIds.getInt(1);
+            } else {
+                pStmt3.setString(1, person.getName());
+                pStmt3.executeUpdate();
+                ResultSet generatedKeys = pStmt3.getGeneratedKeys();
+                generatedKeys.next();
+                personId = generatedKeys.getInt(1);
+            }
+            pStmtRelation.setInt(2, personId);
+            pStmtRelation.executeUpdate();
+        }
+    }
 
+    private PreparedStatement prepareRelationStatement(String role) throws SQLException {
+        PreparedStatement pStmtRelation;
         switch(role) {
             case "artist":
                 pStmtRelation = conn.prepareStatement("INSERT INTO cd_artist (cd, artist) " +
@@ -436,29 +476,10 @@ public class ProductHandler extends DefaultHandler {
                 break;
             default:
                 conn.rollback();
-                return;
+                return null;
         }
-
         pStmtRelation.setString(1, product.getProdNumber());
-
-        for (Person person: personList) {
-            pStmt2.setString(1, person.getName());
-            ResultSet personIds = pStmt2.executeQuery();
-
-            int personId;
-            if (personIds.next()) {
-                personId = personIds.getInt(1);
-            } else {
-                pStmt3.setString(1, person.getName());
-                pStmt3.executeUpdate();
-                ResultSet generatedKeys = pStmt3.getGeneratedKeys();
-                generatedKeys.next();
-                personId = generatedKeys.getInt(1);
-            }
-
-            pStmtRelation.setInt(2, personId);
-            pStmtRelation.executeUpdate();
-        }
+        return pStmtRelation;
     }
 
     private void obtainPersonRelations(Product p) throws SQLException {
