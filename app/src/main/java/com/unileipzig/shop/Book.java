@@ -21,6 +21,20 @@ public class Book extends Product {
         authors = new ArrayList<>();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Book)) {
+            return super.equals(o);
+        }
+        Book other = (Book) o;
+        return super.equals(other)
+                && pageNumber == other.getPageNumber()
+                && publicationDate.isEqual(other.getPublicationDate())
+                && isbn == null || other.getIsbn() == null || isbn.equals(other.getIsbn())
+                && publishers.containsAll(other.getPublishers()) && other.getPublishers().containsAll(publishers)
+                && authors.containsAll(other.getAuthors()) && other.getAuthors().containsAll(authors);
+    }
+
     public int getPageNumber() {
         return pageNumber;
     }
@@ -63,5 +77,9 @@ public class Book extends Product {
 
     public void setAuthors(List<Person> authors) {
         this.authors = authors;
+    }
+
+    public void addAuthor(Person person) {
+        authors.add(person);
     }
 }

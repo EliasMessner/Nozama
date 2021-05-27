@@ -37,6 +37,8 @@ public class App
             saxParser.parse(FILENAME_DRESDEN, similarProductsHandlerDresden);
         } catch (ParserConfigurationException | SAXException | IOException e) {
             e.printStackTrace();
+        } finally {
+            System.out.println("Application Stopping.");
         }
     }
 }

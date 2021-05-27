@@ -20,6 +20,19 @@ public class MusicCd extends Product {
         artists = new ArrayList<>();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MusicCd)) {
+            return super.equals(o);
+        }
+        MusicCd other = (MusicCd) o;
+        return super.equals(other)
+                && labels.containsAll(other.getLabels()) && other.getLabels().containsAll(labels)
+                && publicationDate == null || other.publicationDate == null || publicationDate.isEqual(other.getPublicationDate())
+                && titles.containsAll(other.getTitles()) && other.getTitles().containsAll(titles)
+                && artists.containsAll(other.getArtists()) && other.getArtists().containsAll(artists);
+    }
+
     public List<String> getLabels() {
         return labels;
     }
@@ -58,5 +71,9 @@ public class MusicCd extends Product {
 
     public void setArtists(List<Person> artists) {
         this.artists = artists;
+    }
+
+    public void addArtist(Person person) {
+        artists.add(person);
     }
 }

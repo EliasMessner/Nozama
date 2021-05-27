@@ -11,6 +11,7 @@ public class Product {
     Product(String prodNumber, String title) {
         this.prodNumber = prodNumber;
         this.title = title;
+        this.rating = 3.0;
     }
 
     @Override

@@ -20,6 +20,21 @@ public class Dvd extends Product {
         directors = new ArrayList<>();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Dvd)) {
+            return super.equals(o);
+        }
+        Dvd other = (Dvd) o;
+        return super.equals(other)
+                && format.equals(other.getFormat())
+                && durationMinutes == other.getDurationMinutes()
+                && regionCode == other.getRegionCode()
+                && actors.containsAll(other.getActors()) && other.getActors().containsAll(actors)
+                && creators.containsAll(other.getCreators()) && other.getCreators().containsAll(creators)
+                && directors.containsAll(other.getDirectors()) && other.getDirectors().containsAll(directors);
+    }
+
     public String getFormat() {
         return format;
     }
@@ -66,5 +81,17 @@ public class Dvd extends Product {
 
     public void setDirectors(List<Person> directors) {
         this.directors = directors;
+    }
+
+    public void addActor(Person person) {
+        actors.add(person);
+    }
+
+    public void addCreator(Person person) {
+        creators.add(person);
+    }
+
+    public void addDirector(Person person) {
+        directors.add(person);
     }
 }

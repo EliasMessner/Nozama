@@ -4,14 +4,13 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.xml.crypto.Data;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ProductHandler extends DefaultHandler {
@@ -108,37 +107,29 @@ public class ProductHandler extends DefaultHandler {
         super.endElement(uri, localName, qName);
 
         //System.out.printf("End Element : %s%n", qName);
-
-        if (qName.equals("shop")) {
-            try {
+        try {
+            if (qName.equals("shop")) {
                 persistShop();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-        } else if (qName.equals("item") && !similars) {
-            try {
-                conn.setAutoCommit(false);
-                this.persistProduct();
-                this.persistPersonAndRelations();
-                conn.commit();
-            } catch (SQLException throwables) {
+            } else if (qName.equals("item") && !similars) {
                 try {
-                    conn.rollback();
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                printWriter.println(throwables.getMessage());
-            } finally {
-                try {
-                    conn.setAutoCommit(true);
+                    conn.setAutoCommit(false);
+                    this.persistProduct();
+                    this.persistPersonAndRelations();
+                    conn.commit();
                 } catch (SQLException throwables) {
+                    conn.rollback();
                     throwables.printStackTrace();
+                    printWriter.println(throwables.getMessage());
+                } finally {
+                    conn.setAutoCommit(true);
                 }
+            } else if (qName.equals("tracks")) {
+                tracks = false;
+            } else if (qName.equals("similars")) {
+                similars = false;
             }
-        } else if (qName.equals("tracks")) {
-            tracks = false;
-        } else if (qName.equals("similars")) {
-            similars = false;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
 
         if (currentValue.toString().isBlank()) {
@@ -160,11 +151,11 @@ public class ProductHandler extends DefaultHandler {
             switch (qName) {
                 case "label":
                     if (labelIsAttribute && !attributes.getValue("name").isBlank()) {
-                        ((MusicCd) product).getLabels().add(attributes.getValue("name"));
+                        ((MusicCd) product).addLabel(attributes.getValue("name"));
                     }
                     break;
                 case "artist":
-                    ((MusicCd) product).getArtists().add(new Person(attributes.getValue("name")));
+                    ((MusicCd) product).addArtist(new Person(attributes.getValue("name")));
                     break;
             }
         } else if (product instanceof Book){
@@ -181,23 +172,23 @@ public class ProductHandler extends DefaultHandler {
                     break;
                 case "publisher":
                     if (publisherIsAttribute && !attributes.getValue("name").isBlank()) {
-                        ((Book) product).getPublishers().add(attributes.getValue("name"));
+                        ((Book) product).addPublisher(attributes.getValue("name"));
                     }
                     break;
                 case "author":
-                    ((Book) product).getAuthors().add(new Person(attributes.getValue("name")));
+                    ((Book) product).addAuthor(new Person(attributes.getValue("name")));
                     break;
             }
         } else if (product instanceof Dvd) {
             switch (qName) {
                 case "actor":
-                    ((Dvd) product).getActors().add(new Person(attributes.getValue("name")));
+                    ((Dvd) product).addActor(new Person(attributes.getValue("name")));
                     break;
                 case "creator":
-                    ((Dvd) product).getCreators().add(new Person(attributes.getValue("name")));
+                    ((Dvd) product).addCreator(new Person(attributes.getValue("name")));
                     break;
                 case "director":
-                    ((Dvd) product).getDirectors().add(new Person(attributes.getValue("name")));
+                    ((Dvd) product).addDirector(new Person(attributes.getValue("name")));
                     break;
             }
         }
@@ -210,11 +201,11 @@ public class ProductHandler extends DefaultHandler {
         }
         if (product instanceof MusicCd) {
             switch (qName) {
-                case "releaseDate":
+                case "releasedate":
                     ((MusicCd) product).setPublicationDate(LocalDate.parse(currentValue.toString()));
                     break;
                 case "title":
-                    ((MusicCd) product).getTitles().add(currentValue.toString());
+                    ((MusicCd) product).addTitle(currentValue.toString());
                     break;
             }
         } else if (product instanceof Book) {
@@ -222,7 +213,7 @@ public class ProductHandler extends DefaultHandler {
                 case "pages":
                     ((Book) product).setPageNumber(Integer.parseInt(currentValue.toString()));
                     break;
-                case "releaseDate":
+                case "releasedate":
                     ((MusicCd) product).setPublicationDate(LocalDate.parse(currentValue.toString()));
                     break;
             }
@@ -242,7 +233,7 @@ public class ProductHandler extends DefaultHandler {
     }
 
     public void persistShop() throws SQLException {
-        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store (s_name, street, zip) VALUES (?, ?, ?)" +
+        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store (s_name, street, zip) VALUES (?, ?, ?) " +
                 "ON CONFLICT (s_name, street, zip) DO NOTHING");
         pStmt.setString(1, shop.getName());
         pStmt.setString(2, shop.getStreet());
@@ -251,7 +242,7 @@ public class ProductHandler extends DefaultHandler {
     }
 
     public void persistProduct() throws SQLException {
-        if (!productExists()) {
+        if (!productExists()) { //TODO on conflict...
             PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
                     "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
             pStmt0.setString(1, product.getProdNumber());
@@ -270,35 +261,99 @@ public class ProductHandler extends DefaultHandler {
     }
 
     private boolean productExists() throws SQLException {
-        PreparedStatement pStmt = conn.prepareStatement("SELECT FROM product WHERE prod_number = ?");
+        PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM product WHERE prod_number = ?");
         pStmt.setString(1, product.getProdNumber());
         ResultSet resultSet = pStmt.executeQuery();
         Product other = getProductFromResultSet(resultSet);
-        return product.equals(other);
+        return product.equals(other); //TODO merge
     }
 
     private Product getProductFromResultSet(ResultSet resultSet) throws SQLException {
         if (resultSet.next()) {
-            Product product = new Product(resultSet.getString("prod_number"),
+            Product parsedProduct = new Product(resultSet.getString("prod_number"),
                     resultSet.getString("title"));
-            product.setRating(resultSet.getDouble("rating"));
-            product.setSalesRank(resultSet.getInt("sales_rank"));
-            product.setImage(resultSet.getString("image"));
-            return product;
+            parsedProduct.setRating(resultSet.getDouble("rating"));
+            parsedProduct.setSalesRank(resultSet.getInt("sales_rank"));
+            parsedProduct.setImage(resultSet.getString("image"));
+            return parsedProduct;
         }
         return null;
     }
 
-    private boolean dvdExists() {
-        return false; //TODO
+    private boolean dvdExists() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM dvd NATURAL JOIN product" +
+                " WHERE prod_number = ?");
+        pStmt.setString(1, product.getProdNumber());
+        ResultSet resultSet = pStmt.executeQuery();
+        Dvd other = getDvdFromResultSet(resultSet);
+        return product.equals(other);
     }
 
-    private boolean bookExists() {
-        return false; //TODO
+    private Dvd getDvdFromResultSet(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            Dvd dvd = new Dvd(resultSet.getString("prod_number"),
+                    resultSet.getString("title"));
+            dvd.setRating(resultSet.getDouble("rating"));
+            dvd.setSalesRank(resultSet.getInt("sales_rank"));
+            dvd.setImage(resultSet.getString("image"));
+            dvd.setFormat(resultSet.getString("format"));
+            dvd.setDurationMinutes(resultSet.getInt("duration_minutes"));
+            dvd.setRegionCode(resultSet.getShort("region_code"));
+            obtainPersonRelations(dvd);
+            return dvd;
+        }
+        return null;
     }
 
-    private boolean musicCdExists() {
-        return false; //TODO
+    private boolean bookExists() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM book NATURAL JOIN product" +
+                " WHERE prod_number = ?");
+        pStmt.setString(1, product.getProdNumber());
+        ResultSet resultSet = pStmt.executeQuery();
+        Book other = getBookFromResultSet(resultSet);
+        return product.equals(other);
+    }
+
+    private Book getBookFromResultSet(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            Book book = new Book(resultSet.getString("prod_number"),
+                    resultSet.getString("title"));
+            book.setRating(resultSet.getDouble("rating"));
+            book.setSalesRank(resultSet.getInt("sales_rank"));
+            book.setImage(resultSet.getString("image"));
+            book.setPageNumber(resultSet.getInt("page_number"));
+            book.setPublicationDate(resultSet.getDate("publication_date").toLocalDate());
+            obtainPersonRelations(book);
+            return book;
+        }
+        return null;
+    }
+
+    private boolean musicCdExists() throws SQLException {
+        PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM music_cd NATURAL JOIN product" +
+                " WHERE prod_number = ?");
+        pStmt.setString(1, product.getProdNumber());
+        ResultSet resultSet = pStmt.executeQuery();
+        MusicCd other = getMusicCdFromResultSet(resultSet);
+        return product.equals(other);
+    }
+
+    private MusicCd getMusicCdFromResultSet(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            MusicCd musicCd = new MusicCd(resultSet.getString("prod_number"),
+                    resultSet.getString("title"));
+            musicCd.setRating(resultSet.getDouble("rating"));
+            musicCd.setSalesRank(resultSet.getInt("sales_rank"));
+            musicCd.setImage(resultSet.getString("image"));
+            String[] labels = (String[]) resultSet.getArray("labels").getArray();
+            musicCd.setLabels(Arrays.asList(labels));
+            musicCd.setPublicationDate(resultSet.getDate("publication_date") != null ? resultSet.getDate("publication_date").toLocalDate() : null);
+            String[] titles = (String[]) resultSet.getArray("titles").getArray();
+            musicCd.setTitles(Arrays.asList(titles));
+            obtainPersonRelations(musicCd);
+            return musicCd;
+        }
+        return null;
     }
 
     public void persistBook() throws SQLException {
@@ -404,5 +459,75 @@ public class ProductHandler extends DefaultHandler {
             pStmtRelation.setInt(2, personId);
             pStmtRelation.executeUpdate();
         }
+    }
+
+    private void obtainPersonRelations(Product p) throws SQLException {
+        if (p instanceof MusicCd) {
+            ((MusicCd) p).setArtists(getPersonListForRelation(p, "artist"));
+        } else if (p instanceof Book) {
+            ((Book) p).setAuthors(getPersonListForRelation(p, "author"));
+        } else if (p instanceof Dvd){
+            ((Dvd) p).setActors(getPersonListForRelation(p, "actor"));
+            ((Dvd) p).setCreators(getPersonListForRelation(p, "creator"));
+            ((Dvd) p).setDirectors(getPersonListForRelation(p, "director"));
+        }
+    }
+
+    private List<Person> getPersonListForRelation(Product p, String role) throws SQLException {
+        PreparedStatement pStmt;
+        String col;
+        switch (role) {
+            case "artist":
+                pStmt = conn.prepareStatement("SELECT artist FROM cd_artist WHERE cd = ?");
+                col = "artist";
+                break;
+            case "author":
+                pStmt = conn.prepareStatement("SELECT author FROM book_author WHERE book = ?");
+                col = "author";
+                break;
+            case "actor":
+                pStmt = conn.prepareStatement("SELECT person FROM dvd_person WHERE dvd = ? " +
+                        "AND role = 'actor'");
+                col = "person";
+                break;
+            case "creator":
+                pStmt = conn.prepareStatement("SELECT person FROM dvd_person WHERE dvd = ? " +
+                        "AND role = 'creator'");
+                col = "person";
+                break;
+            case "director":
+                pStmt = conn.prepareStatement("SELECT person FROM dvd_person WHERE dvd = ? " +
+                        "AND role = 'director'");
+                col = "person";
+                break;
+            default:
+                conn.rollback();
+                return null;
+        }
+        pStmt.setString(1, p.getProdNumber());
+        ResultSet resultSet = pStmt.executeQuery();
+        List<Integer> personIDs = columnToIntegerList(resultSet, col);
+        return getPersonsFromIDs(personIDs);
+    }
+
+    private List<Person> getPersonsFromIDs(List<Integer> personIDs) throws SQLException {
+        List<Person> result = new ArrayList<>();
+        PreparedStatement pStmt = conn.prepareStatement("SELECT * FROM person WHERE id = ?");
+        for (int id : personIDs) {
+            pStmt.setInt(1, id);
+            ResultSet rs = pStmt.executeQuery();
+            if (rs.next()) {
+                result.add(new Person(id, rs.getString("name")));
+            }
+        }
+        return result;
+    }
+
+    private List<Integer> columnToIntegerList(ResultSet resultSet, String col) throws SQLException {
+        List<Integer> result = new ArrayList<>();
+        while (resultSet.next()) {
+            result.add(resultSet.getInt(col));
+        }
+        return result;
     }
 }
