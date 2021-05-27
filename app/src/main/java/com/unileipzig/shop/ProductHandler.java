@@ -54,10 +54,11 @@ public class ProductHandler extends DefaultHandler {
 
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-        startElement(uri, localName, qName, attributes, true, true, true);
+        startElement(uri, localName, qName, attributes, true, true, true, true);
     }
 
-    public void startElement(String uri, String localName, String qName, Attributes attributes, boolean imgIsAttribute, boolean publisherIsAttribute, boolean labelIsAttribute) throws SAXException {
+    public void startElement(String uri, String localName, String qName, Attributes attributes, boolean imgIsAttribute,
+                             boolean publisherIsAttribute, boolean labelIsAttribute, boolean personNameIsAttribute) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
 
         currentValue.setLength(0);
@@ -107,6 +108,10 @@ public class ProductHandler extends DefaultHandler {
         }
 
         this.readProductAttributes(uri, localName, qName, attributes, publisherIsAttribute, labelIsAttribute);
+
+        if (personNameIsAttribute) {
+            this.readPersonNamesAsAttribute(uri, localName, qName, attributes);
+        }
 
         if (qName.equals("price")) {
             offer.setArticleCondition(attributes.getValue("state"));
@@ -174,9 +179,6 @@ public class ProductHandler extends DefaultHandler {
                         ((MusicCd) product).getLabels().add(attributes.getValue("name"));
                     }
                     break;
-                case "artist":
-                    ((MusicCd) product).getArtists().add(new Person(attributes.getValue("name")));
-                    break;
             }
         } else if (product instanceof Book){
             switch (qName) {
@@ -195,6 +197,19 @@ public class ProductHandler extends DefaultHandler {
                         ((Book) product).getPublishers().add(attributes.getValue("name"));
                     }
                     break;
+            }
+        }
+    }
+
+    public void readPersonNamesAsAttribute(String uri, String localName, String qName, Attributes attributes) {
+        if (product instanceof MusicCd) {
+            switch (qName) {
+                case "artist":
+                    ((MusicCd) product).getArtists().add(new Person(attributes.getValue("name")));
+                    break;
+            }
+        } else if (product instanceof Book) {
+            switch (qName) {
                 case "author":
                     ((Book) product).getAuthors().add(new Person(attributes.getValue("name")));
                     break;
