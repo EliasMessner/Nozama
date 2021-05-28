@@ -61,6 +61,7 @@ public abstract class ProductHandler extends DefaultHandler {
         switch (qName) {
             case "shop":
                 parseShop(attributes);
+                persistShop();
                 break;
             case "item":
                 startItemTag(attributes);
@@ -84,9 +85,6 @@ public abstract class ProductHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         try {
             switch (qName) {
-                case "shop":
-                    persistShop();
-                    break;
                 case "item":
                     endItemTag();
                     break;
@@ -239,13 +237,18 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void persistShop() throws SQLException {
-        PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store (s_name, street, zip) VALUES (?, ?, ?) " +
-                "ON CONFLICT (s_name, street, zip) DO NOTHING");
-        pStmt.setString(1, shop.getName());
-        pStmt.setString(2, shop.getStreet());
-        pStmt.setInt(3, shop.getZip());
-        pStmt.executeUpdate();
+    public void persistShop(){
+        try {
+            PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store (s_name, street, zip) VALUES (?, ?, ?) " +
+                    "ON CONFLICT (s_name, street, zip) DO NOTHING");
+            pStmt.setString(1, shop.getName());
+            pStmt.setString(2, shop.getStreet());
+            pStmt.setInt(3, shop.getZip());
+            pStmt.executeUpdate();
+        } catch (SQLException e) {
+            printWriter.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void persistProduct() throws SQLException {
