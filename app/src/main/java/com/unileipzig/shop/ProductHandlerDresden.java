@@ -20,7 +20,7 @@ public class ProductHandlerDresden extends ProductHandler {
             product.setImage(attributes.getValue("img"));
         }
     }
-
+/*
     @Override
     protected void readProductTextElements(String uri, String localName, String qName) throws SAXException {
         if (currentValue.toString().isBlank()) return;
@@ -32,7 +32,7 @@ public class ProductHandlerDresden extends ProductHandler {
         } else if (product instanceof Dvd) {
             ((Dvd) product).addCreator(new Person(currentValue.toString()));
         }
-    }
+    }*/
 
     @Override
     protected void readBookTextElements(String qName) {
