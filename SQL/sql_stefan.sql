@@ -13,7 +13,7 @@ CREATE TABLE product(
 
 CREATE TABLE book(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
-    page_number INT,
+    page_number INT CHECK(page_number IS NULL OR page_number > 0),
     publication_date DATE,
     isbn VARCHAR UNIQUE,
     publishers VARCHAR ARRAY
@@ -22,8 +22,8 @@ CREATE TABLE book(
 CREATE TABLE dvd(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     format VARCHAR,
-    duration_minutes INT,
-    region_code SMALLINT
+    duration_minutes INT CHECK(duration_minutes IS NULL OR duration_minutes > 0),
+    region_code SMALLINT CHECK(region_code BETWEEN 0 AND 8)
 );
 
 CREATE TABLE music_cd(

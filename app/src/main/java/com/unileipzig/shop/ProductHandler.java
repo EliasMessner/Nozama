@@ -377,12 +377,8 @@ public abstract class ProductHandler extends DefaultHandler {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
                 "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
         pStmt.setString(1, product.getProdNumber());
-        pStmt.setInt(2, ((Book) product).getPageNumber());
-        if (((Book) product).getPublicationDate() != null) {
-            pStmt.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
-        } else {
-            pStmt.setNull(3, Types.DATE);
-        }
+        pStmt.setObject(2, ((Book) product).getPageNumber(), Types.INTEGER);
+        pStmt.setObject(3, ((Book) product).getPublicationDate(), Types.DATE);
         pStmt.setString(4, ((Book) product).getIsbn());
         pStmt.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
         pStmt.executeUpdate();
@@ -407,7 +403,7 @@ public abstract class ProductHandler extends DefaultHandler {
                 "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
         pStmt.setString(1, product.getProdNumber());
         pStmt.setString(2, ((Dvd) product).getFormat());
-        pStmt.setInt(3, ((Dvd) product).getDurationMinutes());
+        pStmt.setObject(3, ((Dvd) product).getDurationMinutes(), Types.INTEGER);
         pStmt.setShort(4, ((Dvd) product).getRegionCode());
         pStmt.executeUpdate();
     }
