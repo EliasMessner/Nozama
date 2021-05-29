@@ -27,7 +27,7 @@ public class Dvd extends Product {
         }
         Dvd other = (Dvd) o;
         return super.equals(other)
-                && format.equals(other.getFormat())
+                && format == null || other.format == null || format.equals(other.getFormat())
                 && durationMinutes == other.getDurationMinutes()
                 && regionCode == other.getRegionCode()
                 && actors.containsAll(other.getActors()) && other.getActors().containsAll(actors)

@@ -10,10 +10,9 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public abstract class ProductHandler extends DefaultHandler {
 
@@ -74,8 +73,6 @@ public abstract class ProductHandler extends DefaultHandler {
                 break;
             case "price":
                 offer.setArticleCondition(attributes.getValue("state"));
-            default:
-                startTagDefaultCase();
                 break;
         }
         readProductAttributes(qName, attributes);
@@ -114,10 +111,6 @@ public abstract class ProductHandler extends DefaultHandler {
         shop = new Shop(attributes.getValue("name"),
                 attributes.getValue("street"),
                 Integer.parseInt(attributes.getValue("zip")));
-    }
-
-    protected void startTagDefaultCase() {
-        //TODO maybe count occurrences of tags to find syntax errors
     }
 
     protected void startItemTag(Attributes attributes) {
@@ -177,11 +170,11 @@ public abstract class ProductHandler extends DefaultHandler {
     protected void readBookAttributes(String qName, Attributes attributes) {
         switch (qName) {
             case "publication":
-                if (!attributes.getValue("date").isBlank())
+                if (this.attributeValueIsSpecified(attributes.getValue("date")))
                     ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
                 break;
             case "isbn":
-                if (!attributes.getValue("val").isBlank())
+                if (this.attributeValueIsSpecified(attributes.getValue("val")))
                     ((Book) product).setIsbn(attributes.getValue("val"));
                 break;
         }
@@ -192,7 +185,7 @@ public abstract class ProductHandler extends DefaultHandler {
     }
 
     protected void readProductTextElements(String uri, String localName, String qName) throws SAXException {
-        if (currentValue.toString().isBlank()) return;
+        if (!textElementIsSpecified(currentValue.toString())) return;
         if (qName.equals("title") && !tracks && !similars) {
             product.setTitle(currentValue.toString());
             return;
@@ -552,5 +545,13 @@ public abstract class ProductHandler extends DefaultHandler {
             result.add(resultSet.getInt(col));
         }
         return result;
+    }
+
+    protected boolean attributeValueIsSpecified(String attributeValue) {
+        return !(attributeValue.isBlank() || attributeValue.equalsIgnoreCase("not specified"));
+    }
+
+    protected boolean textElementIsSpecified(String textElement) {
+        return !(textElement.isBlank() || textElement.equalsIgnoreCase("not specified"));
     }
 }
