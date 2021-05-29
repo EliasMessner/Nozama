@@ -1,5 +1,7 @@
 #!/bin/sh
 
+sleep 3
+
 PGPASSWORD=example dropdb -p 5432 -h db -U postgres -e test_1
 PGPASSWORD=example createdb -p 5432 -h db -U postgres -e test_1
 
