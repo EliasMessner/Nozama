@@ -72,7 +72,9 @@ public abstract class ProductHandler extends DefaultHandler {
                 similars = true;
                 break;
             case "price":
-                offer.setArticleCondition(attributes.getValue("state"));
+                if (this.attributeValueIsSpecified(attributes.getValue("state"))) {
+                    offer.setArticleCondition(attributes.getValue("state"));
+                }
                 break;
         }
         readProductAttributes(qName, attributes);
