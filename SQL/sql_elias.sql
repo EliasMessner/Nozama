@@ -35,13 +35,13 @@ CREATE TABLE sale(
 );
 
 CREATE TABLE review(
+    id SERIAL PRIMARY KEY,
 	customer VARCHAR REFERENCES customer(username),
     product VARCHAR REFERENCES product(prod_number),
     date DATE CHECK(date <= CURRENT_DATE),
 	stars INT NOT NULL,
 	summary VARCHAR,
-	details TEXT,
-	PRIMARY KEY (customer, product)
+	details TEXT
 );
 
 CREATE TABLE similar_products(

@@ -5,10 +5,7 @@ import com.opencsv.CSVReaderBuilder;
 import com.opencsv.exceptions.CsvException;
 
 import java.io.*;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 
 public class ReviewHandler {
@@ -50,8 +47,10 @@ public class ReviewHandler {
                 try {
                     conn.setAutoCommit(false);
 
-                    pStmtCustomer.setString(1, line[4]);
-                    pStmtCustomer.executeUpdate();
+                    if (!line[4].equals("guest")) {
+                        pStmtCustomer.setString(1, line[4]);
+                        pStmtCustomer.executeUpdate();
+                    }
 
                     setReviewQueryParameters(pStmtReview, line);
                     pStmtReview.executeUpdate();
@@ -78,7 +77,12 @@ public class ReviewHandler {
     }
 
     private void setReviewQueryParameters(PreparedStatement pStmtReview, String[] line) throws SQLException {
-        pStmtReview.setString(1, line[4]);
+        if (line[4].equals("guest")) {
+            pStmtReview.setNull(1, Types.VARCHAR);
+        } else {
+            pStmtReview.setString(1, line[4]);
+        }
+
         pStmtReview.setString(2, line[0]);
         pStmtReview.setDate(3, Date.valueOf(line[3]));
         pStmtReview.setInt(4, Integer.parseInt(line[1]));
