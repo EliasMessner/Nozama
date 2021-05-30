@@ -19,19 +19,6 @@ public class ProductHandlerDresden extends ProductHandler {
             product.setImage(attributes.getValue("img"));
         }
     }
-/*
-    @Override
-    protected void readProductTextElements(String uri, String localName, String qName) throws SAXException {
-        if (currentValue.toString().isBlank()) return;
-        super.readProductTextElements(uri, localName, qName);
-        if (product instanceof Book) {
-             readBookTextElements(qName);
-        } else if (product instanceof MusicCd && qName.equals("label")) {
-            ((MusicCd) product).addLabel(currentValue.toString());
-        } else if (product instanceof Dvd) {
-            ((Dvd) product).addCreator(new Person(currentValue.toString()));
-        }
-    }*/
 
     @Override
     protected void readBookTextElements(String qName) {

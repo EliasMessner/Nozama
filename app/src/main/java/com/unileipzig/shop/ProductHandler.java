@@ -155,7 +155,7 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void readProductAttributes(String qName, Attributes attributes) throws SAXException {
+    public void readProductAttributes(String qName, Attributes attributes) {
         if (product instanceof MusicCd){
             readMusicCdAttributes(qName, attributes);
         } else if (product instanceof Book){
@@ -247,7 +247,7 @@ public abstract class ProductHandler extends DefaultHandler {
     }
 
     public void persistProduct() throws SQLException {
-        if (!productExists()) { //TODO on conflict...
+        if (!productExists()) {
             PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
                     "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
             pStmt0.setString(1, product.getProdNumber());
@@ -282,7 +282,7 @@ public abstract class ProductHandler extends DefaultHandler {
         pStmt.setString(1, product.getProdNumber());
         ResultSet resultSet = pStmt.executeQuery();
         Product other = getProductFromResultSet(resultSet);
-        return product.equals(other); //TODO merge
+        return product.equals(other);
     }
 
     private Product getProductFromResultSet(ResultSet resultSet) throws SQLException {
@@ -449,23 +449,23 @@ public abstract class ProductHandler extends DefaultHandler {
         switch(role) {
             case "artist":
                 pStmtRelation = conn.prepareStatement("INSERT INTO cd_artist (cd, artist) " +
-                        "VALUES (?, ?)");
+                        "VALUES (?, ?) ON CONFLICT (cd, artist) DO NOTHING");
                 break;
             case "author":
                 pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) " +
-                        "VALUES (?, ?)");
+                        "VALUES (?, ?) ON CONFLICT (book, author) DO NOTHING");
                 break;
             case "actor":
                 pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'actor')");
+                        "VALUES (?, ?, 'actor') ON CONFLICT (dvd, person, role) DO NOTHING");
                 break;
             case "creator":
                 pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'creator')");
+                        "VALUES (?, ?, 'creator') ON CONFLICT (dvd, person, role) DO NOTHING");
                 break;
             case "director":
                 pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'director')");
+                        "VALUES (?, ?, 'director') ON CONFLICT (dvd, person, role) DO NOTHING");
                 break;
             default:
                 conn.rollback();
