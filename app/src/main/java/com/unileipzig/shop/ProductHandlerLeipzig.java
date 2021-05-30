@@ -33,7 +33,7 @@ public class ProductHandlerLeipzig extends ProductHandler {
     protected void readMusicCdAttributes(String qName, Attributes attributes) {
         switch (qName) {
             case "label":
-                if (!attributes.getValue("name").isBlank()) {
+                if (this.attributeValueIsSpecified(attributes.getValue("name"))) {
                     ((MusicCd) product).addLabel(attributes.getValue("name"));
                 }
                 break;
@@ -48,7 +48,7 @@ public class ProductHandlerLeipzig extends ProductHandler {
         super.readBookAttributes(qName, attributes);
         switch (qName) {
             case "publisher":
-                if (!attributes.getValue("name").isBlank()) {
+                if (attributeValueIsSpecified(attributes.getValue("name"))) {
                     ((Book) product).addPublisher(attributes.getValue("name"));
                 }
                 break;

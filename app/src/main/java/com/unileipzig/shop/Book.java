@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Book extends Product {
 
-    private int pageNumber;
+    private Integer pageNumber;
     private LocalDate publicationDate;
     private String isbn;
     private List<String> publishers;
@@ -35,11 +35,11 @@ public class Book extends Product {
                 && authors.containsAll(other.getAuthors()) && other.getAuthors().containsAll(authors);
     }
 
-    public int getPageNumber() {
+    public Integer getPageNumber() {
         return pageNumber;
     }
 
-    public void setPageNumber(int pageNumber) {
+    public void setPageNumber(Integer pageNumber) {
         this.pageNumber = pageNumber;
     }
 

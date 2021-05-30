@@ -6,7 +6,7 @@ import java.util.List;
 public class Dvd extends Product {
 
     private String format;
-    private int durationMinutes;
+    private Integer durationMinutes;
     private short regionCode;
     private List<Person> actors;
     private List<Person> creators;
@@ -27,7 +27,7 @@ public class Dvd extends Product {
         }
         Dvd other = (Dvd) o;
         return super.equals(other)
-                && format.equals(other.getFormat())
+                && format == null || other.format == null || format.equals(other.getFormat())
                 && durationMinutes == other.getDurationMinutes()
                 && regionCode == other.getRegionCode()
                 && actors.containsAll(other.getActors()) && other.getActors().containsAll(actors)
@@ -43,11 +43,11 @@ public class Dvd extends Product {
         this.format = format;
     }
 
-    public int getDurationMinutes() {
+    public Integer getDurationMinutes() {
         return durationMinutes;
     }
 
-    public void setDurationMinutes(int durationMinutes) {
+    public void setDurationMinutes(Integer durationMinutes) {
         this.durationMinutes = durationMinutes;
     }
 

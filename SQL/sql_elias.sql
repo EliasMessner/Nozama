@@ -12,7 +12,7 @@ CREATE TABLE store_inventory(
 	store_street VARCHAR,
 	store_zip INT,
 	article_condition VARCHAR NOT NULL,
-	price DECIMAL(10,2),
+	price DECIMAL(10,2) CHECK (price IS NULL OR price >= 0),
 	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store(s_name, street, zip)
 );
 
@@ -27,7 +27,7 @@ CREATE TABLE customer(
 CREATE TABLE sale(
 	customer INT REFERENCES customer(customerID),
     product VARCHAR REFERENCES product(prod_number),
-	dateTime TIMESTAMP,
+	dateTime TIMESTAMP CHECK(dateTime <= CURRENT_TIMESTAMP),
 	delivery_address VARCHAR NOT NULL,
 	bank_account VARCHAR NOT NULL,
 	PRIMARY KEY (customer, product, dateTime)
@@ -36,6 +36,7 @@ CREATE TABLE sale(
 CREATE TABLE rating(
 	customer INT REFERENCES customer(customerID),
     product VARCHAR REFERENCES product(prod_number),
+    date DATE CHECK(date <= CURRENT_DATE),
 	stars INT NOT NULL,
 	review TEXT,
 	PRIMARY KEY (customer, product)

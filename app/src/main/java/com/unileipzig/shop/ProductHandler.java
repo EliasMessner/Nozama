@@ -10,10 +10,9 @@ import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.*;
+import java.sql.Date;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public abstract class ProductHandler extends DefaultHandler {
 
@@ -73,9 +72,9 @@ public abstract class ProductHandler extends DefaultHandler {
                 similars = true;
                 break;
             case "price":
-                offer.setArticleCondition(attributes.getValue("state"));
-            default:
-                startTagDefaultCase();
+                if (this.attributeValueIsSpecified(attributes.getValue("state"))) {
+                    offer.setArticleCondition(attributes.getValue("state"));
+                }
                 break;
         }
         readProductAttributes(qName, attributes);
@@ -114,10 +113,6 @@ public abstract class ProductHandler extends DefaultHandler {
         shop = new Shop(attributes.getValue("name"),
                 attributes.getValue("street"),
                 Integer.parseInt(attributes.getValue("zip")));
-    }
-
-    protected void startTagDefaultCase() {
-        //TODO maybe count occurrences of tags to find syntax errors
     }
 
     protected void startItemTag(Attributes attributes) {
@@ -177,11 +172,11 @@ public abstract class ProductHandler extends DefaultHandler {
     protected void readBookAttributes(String qName, Attributes attributes) {
         switch (qName) {
             case "publication":
-                if (!attributes.getValue("date").isBlank())
+                if (this.attributeValueIsSpecified(attributes.getValue("date")))
                     ((Book) product).setPublicationDate(LocalDate.parse(attributes.getValue("date")));
                 break;
             case "isbn":
-                if (!attributes.getValue("val").isBlank())
+                if (this.attributeValueIsSpecified(attributes.getValue("val")))
                     ((Book) product).setIsbn(attributes.getValue("val"));
                 break;
         }
@@ -192,7 +187,7 @@ public abstract class ProductHandler extends DefaultHandler {
     }
 
     protected void readProductTextElements(String uri, String localName, String qName) throws SAXException {
-        if (currentValue.toString().isBlank()) return;
+        if (!textElementIsSpecified(currentValue.toString())) return;
         if (qName.equals("title") && !tracks && !similars) {
             product.setTitle(currentValue.toString());
             return;
@@ -382,12 +377,8 @@ public abstract class ProductHandler extends DefaultHandler {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
                 "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
         pStmt.setString(1, product.getProdNumber());
-        pStmt.setInt(2, ((Book) product).getPageNumber());
-        if (((Book) product).getPublicationDate() != null) {
-            pStmt.setDate(3, Date.valueOf(((Book) product).getPublicationDate()));
-        } else {
-            pStmt.setNull(3, Types.DATE);
-        }
+        pStmt.setObject(2, ((Book) product).getPageNumber(), Types.INTEGER);
+        pStmt.setObject(3, ((Book) product).getPublicationDate(), Types.DATE);
         pStmt.setString(4, ((Book) product).getIsbn());
         pStmt.setArray(5, conn.createArrayOf("VARCHAR", ((Book) product).getPublishers().toArray()));
         pStmt.executeUpdate();
@@ -412,7 +403,7 @@ public abstract class ProductHandler extends DefaultHandler {
                 "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
         pStmt.setString(1, product.getProdNumber());
         pStmt.setString(2, ((Dvd) product).getFormat());
-        pStmt.setInt(3, ((Dvd) product).getDurationMinutes());
+        pStmt.setObject(3, ((Dvd) product).getDurationMinutes(), Types.INTEGER);
         pStmt.setShort(4, ((Dvd) product).getRegionCode());
         pStmt.executeUpdate();
     }
@@ -552,5 +543,13 @@ public abstract class ProductHandler extends DefaultHandler {
             result.add(resultSet.getInt(col));
         }
         return result;
+    }
+
+    protected boolean attributeValueIsSpecified(String attributeValue) {
+        return !(attributeValue.isBlank() || attributeValue.equalsIgnoreCase("not specified"));
+    }
+
+    protected boolean textElementIsSpecified(String textElement) {
+        return !(textElement.isBlank() || textElement.equalsIgnoreCase("not specified"));
     }
 }
