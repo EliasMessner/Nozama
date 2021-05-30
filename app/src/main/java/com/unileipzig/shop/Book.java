@@ -1,9 +1,7 @@
 package com.unileipzig.shop;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Book extends Product {
@@ -28,7 +26,7 @@ public class Book extends Product {
         }
         Book other = (Book) o;
         return super.equals(other)
-                && pageNumber == other.getPageNumber()
+                && pageNumber == null || other.getPageNumber() == null || pageNumber.equals(other.getPageNumber())
                 && publicationDate.isEqual(other.getPublicationDate())
                 && isbn == null || other.getIsbn() == null || isbn.equals(other.getIsbn())
                 && publishers.containsAll(other.getPublishers()) && other.getPublishers().containsAll(publishers)

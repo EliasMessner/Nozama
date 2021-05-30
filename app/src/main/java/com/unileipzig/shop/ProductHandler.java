@@ -99,7 +99,7 @@ public abstract class ProductHandler extends DefaultHandler {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        this.readProductTextElements(uri, localName, qName);
+        this.readProductTextElements(qName);
     }
 
     protected BigDecimal parsePrice() {
@@ -186,7 +186,7 @@ public abstract class ProductHandler extends DefaultHandler {
 
     }
 
-    protected void readProductTextElements(String uri, String localName, String qName) throws SAXException {
+    protected void readProductTextElements(String qName) {
         if (!textElementIsSpecified(currentValue.toString())) return;
         if (qName.equals("title") && !tracks && !similars) {
             product.setTitle(currentValue.toString());

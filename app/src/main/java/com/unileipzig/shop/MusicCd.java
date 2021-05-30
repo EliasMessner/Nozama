@@ -2,7 +2,6 @@ package com.unileipzig.shop;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class MusicCd extends Product {
@@ -28,7 +27,7 @@ public class MusicCd extends Product {
         MusicCd other = (MusicCd) o;
         return super.equals(other)
                 && labels.containsAll(other.getLabels()) && other.getLabels().containsAll(labels)
-                && publicationDate == null || other.publicationDate == null || publicationDate.isEqual(other.getPublicationDate())
+                && publicationDate == null || other.getPublicationDate() == null || publicationDate.isEqual(other.getPublicationDate())
                 && titles.containsAll(other.getTitles()) && other.getTitles().containsAll(titles)
                 && artists.containsAll(other.getArtists()) && other.getArtists().containsAll(artists);
     }

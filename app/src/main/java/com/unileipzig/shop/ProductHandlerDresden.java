@@ -5,7 +5,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.time.LocalDate;
 
 public class ProductHandlerDresden extends ProductHandler {
 

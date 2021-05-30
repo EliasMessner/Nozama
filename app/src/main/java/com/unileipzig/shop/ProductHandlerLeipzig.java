@@ -1,12 +1,8 @@
 package com.unileipzig.shop;
 
 import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.time.LocalDate;
 
 public class ProductHandlerLeipzig extends ProductHandler {
 
