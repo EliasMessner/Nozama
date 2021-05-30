@@ -3,9 +3,9 @@ package com.unileipzig.shop;
 public class Shop {
     String name;
     String street;
-    int zip;
+    String zip;
 
-    public Shop(String name, String street, int zip) {
+    public Shop(String name, String street, String zip) {
         this.name = name;
         this.street = street;
         this.zip = zip;
@@ -27,11 +27,11 @@ public class Shop {
         this.street = street;
     }
 
-    public int getZip() {
+    public String getZip() {
         return zip;
     }
 
-    public void setZip(int zip) {
+    public void setZip(String zip) {
         this.zip = zip;
     }
 }
