@@ -30,6 +30,11 @@
       <artifactId>postgresql</artifactId>
       <version>42.2.20</version>
     </dependency>
+    <dependency>
+      <groupId>com.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>5.4</version>
+    </dependency>
   </dependencies>
 
   <build><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
