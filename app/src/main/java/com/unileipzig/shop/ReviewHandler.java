@@ -37,6 +37,9 @@ public class ReviewHandler {
 
     private void persistUserAndReview(List<String[]> listOfLines) {
         try {
+            PreparedStatement pStmtCustomerSelect = conn.prepareStatement("SELECT * FROM customer WHERE " +
+                    "username = ?");
+
             PreparedStatement pStmtCustomer = conn.prepareStatement("INSERT INTO customer (username) VALUES (?)");
 
             PreparedStatement pStmtReview = conn.prepareStatement("INSERT INTO review (customer, product, date, " +
@@ -48,8 +51,13 @@ public class ReviewHandler {
                     conn.setAutoCommit(false);
 
                     if (!line[4].equals("guest")) {
-                        pStmtCustomer.setString(1, line[4]);
-                        pStmtCustomer.executeUpdate();
+                        pStmtCustomerSelect.setString(1, line[4]);
+                        ResultSet resultSet = pStmtCustomerSelect.executeQuery();
+
+                        if (!resultSet.next()) {
+                            pStmtCustomer.setString(1, line[4]);
+                            pStmtCustomer.executeUpdate();
+                        }
                     }
 
                     setReviewQueryParameters(pStmtReview, line);
