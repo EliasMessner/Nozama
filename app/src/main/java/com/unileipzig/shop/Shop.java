@@ -1,6 +1,7 @@
 package com.unileipzig.shop;
 
 public class Shop {
+
     String name;
     String street;
     int zip;

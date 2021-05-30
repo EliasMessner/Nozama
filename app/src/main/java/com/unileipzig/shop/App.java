@@ -1,7 +1,6 @@
 package com.unileipzig.shop;
 
 import org.xml.sax.SAXException;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -12,8 +11,7 @@ import java.sql.Connection;
  * Hello world!
  *
  */
-public class App
-{
+public class App {
 
     private static final String FILENAME_LEIPZIG = "/data/leipzig_transformed.xml";
     private static final String FILENAME_DRESDEN = "/data/dresden.xml";

@@ -3,6 +3,11 @@ package com.unileipzig.shop;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.unileipzig.shop.CompareUtil.equalsAllowNull;
+
+/**
+ * Represents a DVD.
+ */
 public class Dvd extends Product {
 
     private String format;
@@ -12,9 +17,13 @@ public class Dvd extends Product {
     private List<Person> creators;
     private List<Person> directors;
 
+    /**
+     * Constructs a DVD Object with empty lists for all person-lists, initial rating of 3.0, specified product number and title.
+     * @param prodNumber
+     * @param title
+     */
     Dvd(String prodNumber, String title) {
         super(prodNumber, title);
-
         actors = new ArrayList<>();
         creators = new ArrayList<>();
         directors = new ArrayList<>();
@@ -27,8 +36,8 @@ public class Dvd extends Product {
         }
         Dvd other = (Dvd) o;
         return super.equals(other)
-                && format == null || other.getFormat() == null || format.equals(other.getFormat())
-                && durationMinutes == null || other.getDurationMinutes() == null || durationMinutes.equals(other.getDurationMinutes())
+                && equalsAllowNull(format, other.getFormat())
+                && equalsAllowNull(durationMinutes, other.getDurationMinutes())
                 && regionCode == other.getRegionCode()
                 && actors.containsAll(other.getActors()) && other.getActors().containsAll(actors)
                 && creators.containsAll(other.getCreators()) && other.getCreators().containsAll(creators)

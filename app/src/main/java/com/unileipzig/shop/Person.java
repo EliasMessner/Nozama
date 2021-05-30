@@ -1,5 +1,7 @@
 package com.unileipzig.shop;
 
+import static com.unileipzig.shop.CompareUtil.alphanumericallyEquals;
+
 public class Person {
 
     private int id;
@@ -17,10 +19,9 @@ public class Person {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Person)) return super.equals(o);
-        return ((Person) o).getName().equals(name);
-        // only compare name because when checking if contributors of a product are the same,
-        // the ids of the parsed product are not yet set and are always different from those
-        // in the database
+        return alphanumericallyEquals(((Person) o).getName(), name);
+        // only compare name because when checking if contributors of a product are the same, the id of the parsed
+        // product is not yet set and is always different from the one in the database
     }
 
     public void setId(int id) {

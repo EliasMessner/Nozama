@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.unileipzig.shop.CompareUtil.alphanumericallyEqualsIgnoreOrder;
+import static com.unileipzig.shop.CompareUtil.equalsAllowNull;
+
 public class MusicCd extends Product {
 
     private List<String> labels;
@@ -26,9 +29,9 @@ public class MusicCd extends Product {
         }
         MusicCd other = (MusicCd) o;
         return super.equals(other)
-                && labels.containsAll(other.getLabels()) && other.getLabels().containsAll(labels)
-                && publicationDate == null || other.getPublicationDate() == null || publicationDate.isEqual(other.getPublicationDate())
-                && titles.containsAll(other.getTitles()) && other.getTitles().containsAll(titles)
+                && alphanumericallyEqualsIgnoreOrder(labels, other.getLabels())
+                && equalsAllowNull(publicationDate, other.getPublicationDate())
+                && alphanumericallyEqualsIgnoreOrder(titles, other.getTitles())
                 && artists.containsAll(other.getArtists()) && other.getArtists().containsAll(artists);
     }
 

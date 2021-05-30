@@ -144,6 +144,7 @@ public abstract class ProductHandler extends DefaultHandler {
             conn.setAutoCommit(false);
             this.persistProduct();
             this.persistPersonAndRelations();
+            conn.commit(); // commit here already because if only persistOffer fails we still want to keep the product
             this.persistOffer();
             conn.commit();
         } catch (SQLException throwables) {
@@ -440,6 +441,7 @@ public abstract class ProductHandler extends DefaultHandler {
                 personId = generatedKeys.getInt(1);
             }
             pStmtRelation.setInt(2, personId);
+            pStmtRelation.setInt(4, personId);
             pStmtRelation.executeUpdate();
         }
     }
@@ -449,29 +451,33 @@ public abstract class ProductHandler extends DefaultHandler {
         switch(role) {
             case "artist":
                 pStmtRelation = conn.prepareStatement("INSERT INTO cd_artist (cd, artist) " +
-                        "VALUES (?, ?) ON CONFLICT (cd, artist) DO NOTHING");
+                        "VALUES (?, ?) ON CONFLICT (cd, artist) DO UPDATE SET cd = ?, artist = ?");
                 break;
             case "author":
                 pStmtRelation = conn.prepareStatement("INSERT INTO book_author (book, author) " +
-                        "VALUES (?, ?) ON CONFLICT (book, author) DO NOTHING");
+                        "VALUES (?, ?) ON CONFLICT (book, author) DO UPDATE SET book = ?, author = ?");
                 break;
             case "actor":
                 pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'actor') ON CONFLICT (dvd, person, role) DO NOTHING");
+                        "VALUES (?, ?, 'actor') ON CONFLICT (dvd, person, role) DO UPDATE SET dvd = ?, " +
+                        "person = ?, role = 'actor'");
                 break;
             case "creator":
                 pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'creator') ON CONFLICT (dvd, person, role) DO NOTHING");
+                        "VALUES (?, ?, 'creator') ON CONFLICT (dvd, person, role) DO UPDATE SET dvd = ?, person = ?, " +
+                        "role = 'creator'");
                 break;
             case "director":
                 pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'director') ON CONFLICT (dvd, person, role) DO NOTHING");
+                        "VALUES (?, ?, 'director') ON CONFLICT (dvd, person, role) DO UPDATE SET dvd = ?, person = ?, " +
+                        "role = 'director'");
                 break;
             default:
                 conn.rollback();
                 return null;
         }
         pStmtRelation.setString(1, product.getProdNumber());
+        pStmtRelation.setString(3, product.getProdNumber());
         return pStmtRelation;
     }
 
