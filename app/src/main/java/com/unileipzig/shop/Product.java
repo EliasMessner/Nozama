@@ -4,15 +4,15 @@ import static com.unileipzig.shop.CompareUtil.alphanumericallyEquals;
 import static com.unileipzig.shop.CompareUtil.equalsAllowNull;
 
 /**
- * Represents a product.
+ * model for table product
  */
 public class Product {
 
-    String prodNumber;
-    String title;
-    double rating;
-    int salesRank;
-    String image;
+    private String prodNumber;
+    private String title;
+    private double rating;
+    private int salesRank;
+    private String image;
 
     /**
      * Constructs a product with initial rating of 3.0, specified title and product number.
@@ -25,12 +25,10 @@ public class Product {
         this.rating = 3.0;
     }
 
-    /**
-     * Returns true if this Product is equal to the specified object. If the specified Object is also a product,
-     * returns true if the titles of both are equal with regard to only alphanumerical characters, and null values for
-     * optional attribute image don't violate equality.
+    /**.
      * @param o the Object to compare this product to
-     * @return true if Product is equal to the specified object.
+     * @return true if the titles of both are equal with regard to only alphanumerical characters, and null values for
+     * optional attribute image don't violate equality
      */
     @Override
     public boolean equals(Object o) {
@@ -83,5 +81,4 @@ public class Product {
     public void setImage(String image) {
         this.image = image;
     }
-
 }

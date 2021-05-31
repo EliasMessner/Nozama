@@ -14,6 +14,9 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.*;
 
+/**
+ * class for retrieving data from dresden.xml and leipzig_transformed.xml
+ */
 public abstract class ProductHandler extends DefaultHandler {
 
     protected StringBuilder currentValue = new StringBuilder();
@@ -37,23 +40,35 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void startDocument() throws SAXException {
         System.out.println("Start Document");
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void endDocument() throws SAXException {
         System.out.println("End Document");
         printWriter.close();
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         super.characters(ch, start, length);
         currentValue.append(ch, start, length);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         currentValue.setLength(0);
@@ -80,6 +95,9 @@ public abstract class ProductHandler extends DefaultHandler {
         readProductAttributes(qName, attributes);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         try {
@@ -102,6 +120,10 @@ public abstract class ProductHandler extends DefaultHandler {
         this.readProductTextElements(qName);
     }
 
+    /**
+     * computes price from xml values
+     * @return the computed price
+     */
     protected BigDecimal parsePrice() {
         if (currentValue.toString().isBlank())
             return null;
@@ -109,12 +131,20 @@ public abstract class ProductHandler extends DefaultHandler {
         return price100.divide(new BigDecimal("100"), RoundingMode.HALF_UP);
     }
 
+    /**
+     * creates shop from xml values
+     * @param attributes
+     */
     protected void parseShop(Attributes attributes) {
         shop = new Shop(attributes.getValue("name"),
                 attributes.getValue("street"),
                 attributes.getValue("zip"));
     }
 
+    /**
+     * chooses and creates correct product type and creates corresponding offer
+     * @param attributes
+     */
     protected void startItemTag(Attributes attributes) {
         if (similars) return;
         System.out.println("Current item: " + attributes.getValue("asin"));
@@ -138,6 +168,10 @@ public abstract class ProductHandler extends DefaultHandler {
         offer = new Offer(product, shop);
     }
 
+    /**
+     * persist product, person (with relations) and offer
+     * @throws SQLException
+     */
     protected void endItemTag() throws SQLException {
         if (similars) return;
         try {
@@ -156,7 +190,7 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void readProductAttributes(String qName, Attributes attributes) {
+    protected void readProductAttributes(String qName, Attributes attributes) {
         if (product instanceof MusicCd){
             readMusicCdAttributes(qName, attributes);
         } else if (product instanceof Book){
@@ -233,7 +267,7 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void persistShop(){
+    private void persistShop(){
         try {
             PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store (s_name, street, zip) VALUES (?, ?, ?) " +
                     "ON CONFLICT (s_name, street, zip) DO NOTHING");
@@ -247,7 +281,7 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void persistProduct() throws SQLException {
+    private void persistProduct() throws SQLException {
         if (!productExists()) {
             PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
                     "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
@@ -266,7 +300,7 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    public void persistOffer() throws SQLException {
+    private void persistOffer() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store_inventory (product, " +
                 "store_name, store_street, store_zip, article_condition, price) VALUES (?, ?, ?, ?, ?, ?)");
         pStmt.setString(1, offer.getProduct().getProdNumber());
@@ -374,7 +408,7 @@ public abstract class ProductHandler extends DefaultHandler {
         return null;
     }
 
-    public void persistBook() throws SQLException {
+    private void persistBook() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO book (prod_number, page_number, " +
                 "publication_date, isbn, publishers) VALUES (?, ?, ?, ?, ?)");
         pStmt.setString(1, product.getProdNumber());
@@ -385,7 +419,7 @@ public abstract class ProductHandler extends DefaultHandler {
         pStmt.executeUpdate();
     }
 
-    public void persistMusicCd() throws SQLException {
+    private void persistMusicCd() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO music_cd (prod_number, labels, " +
                 "publication_date, titles) VALUES (?, ?, ?, ?)");
         pStmt.setString(1, product.getProdNumber());
@@ -399,7 +433,7 @@ public abstract class ProductHandler extends DefaultHandler {
         pStmt.executeUpdate();
     }
 
-    public void persistDvd() throws SQLException {
+    private void persistDvd() throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO dvd (prod_number, format, " +
                 "duration_minutes, region_code) VALUES (?, ?, ?, ?)");
         pStmt.setString(1, product.getProdNumber());
@@ -409,7 +443,7 @@ public abstract class ProductHandler extends DefaultHandler {
         pStmt.executeUpdate();
     }
 
-    public void persistPersonAndRelations() throws SQLException {
+    private void persistPersonAndRelations() throws SQLException {
         if (product instanceof MusicCd) {
             this.persistPersonAndRelationsHelper("artist", ((MusicCd) product).getArtists());
         } else if (product instanceof Book) {
@@ -551,10 +585,20 @@ public abstract class ProductHandler extends DefaultHandler {
         return result;
     }
 
+    /**
+     * tests whether an attribute really contains a relevant value (e.g. maybe value is empty string)
+     * @param attributeValue
+     * @return true if attributeValue is relevant
+     */
     protected boolean attributeValueIsSpecified(String attributeValue) {
         return !(attributeValue.isBlank() || attributeValue.equalsIgnoreCase("not specified"));
     }
 
+    /**
+     * tests whether a text element really contains a relevant value (e.g. maybe value is empty string)
+     * @param textElement
+     * @return true if attributeValue is relevant
+     */
     protected boolean textElementIsSpecified(String textElement) {
         return !(textElement.isBlank() || textElement.equalsIgnoreCase("not specified"));
     }

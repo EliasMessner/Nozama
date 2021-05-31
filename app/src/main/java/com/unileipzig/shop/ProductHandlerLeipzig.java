@@ -4,12 +4,24 @@ import org.xml.sax.Attributes;
 import java.io.IOException;
 import java.sql.Connection;
 
+/**
+ * subclass for retrieving data from leipzig_transformed.xml
+ */
 public class ProductHandlerLeipzig extends ProductHandler {
 
+    /**
+     *
+     * @param conn
+     * @param errorPath
+     * @throws IOException
+     */
     public ProductHandlerLeipzig(Connection conn, String errorPath) throws IOException {
         super(conn, errorPath);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void readDvdAttributes(String qName, Attributes attributes) {
         switch (qName) {
@@ -25,6 +37,9 @@ public class ProductHandlerLeipzig extends ProductHandler {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void readMusicCdAttributes(String qName, Attributes attributes) {
         switch (qName) {
@@ -39,6 +54,9 @@ public class ProductHandlerLeipzig extends ProductHandler {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void readBookAttributes(String qName, Attributes attributes) {
         super.readBookAttributes(qName, attributes);
@@ -54,6 +72,9 @@ public class ProductHandlerLeipzig extends ProductHandler {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void startItemTag(Attributes attributes) {
         super.startItemTag(attributes);

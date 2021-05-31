@@ -2,6 +2,9 @@ package com.unileipzig.shop;
 
 import java.math.BigDecimal;
 
+/**
+ * model for table store_inventory
+ */
 public class Offer {
 
     private int artId;

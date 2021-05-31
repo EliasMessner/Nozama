@@ -2,6 +2,9 @@ package com.unileipzig.shop;
 
 import java.time.LocalDate;
 
+/**
+ * model for table review
+ */
 public class Review {
 
     private Customer customer;
