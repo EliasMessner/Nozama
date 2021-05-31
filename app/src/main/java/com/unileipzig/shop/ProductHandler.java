@@ -112,7 +112,7 @@ public abstract class ProductHandler extends DefaultHandler {
     protected void parseShop(Attributes attributes) {
         shop = new Shop(attributes.getValue("name"),
                 attributes.getValue("street"),
-                Integer.parseInt(attributes.getValue("zip")));
+                attributes.getValue("zip"));
     }
 
     protected void startItemTag(Attributes attributes) {
@@ -239,7 +239,7 @@ public abstract class ProductHandler extends DefaultHandler {
                     "ON CONFLICT (s_name, street, zip) DO NOTHING");
             pStmt.setString(1, shop.getName());
             pStmt.setString(2, shop.getStreet());
-            pStmt.setInt(3, shop.getZip());
+            pStmt.setString(3, shop.getZip());
             pStmt.executeUpdate();
         } catch (SQLException e) {
             printWriter.println(e.getMessage());
@@ -272,7 +272,7 @@ public abstract class ProductHandler extends DefaultHandler {
         pStmt.setString(1, offer.getProduct().getProdNumber());
         pStmt.setString(2, offer.getShop().getName());
         pStmt.setString(3, offer.getShop().getStreet());
-        pStmt.setInt(4, offer.getShop().getZip());
+        pStmt.setString(4, offer.getShop().getZip());
         pStmt.setString(5, offer.getArticleCondition());
         pStmt.setBigDecimal(6, offer.getPrice());
         pStmt.executeUpdate();
