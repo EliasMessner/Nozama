@@ -1,14 +1,12 @@
 package com.unileipzig.shop;
 
-import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Book extends Product {
 
-    private int pageNumber;
+    private Integer pageNumber;
     private LocalDate publicationDate;
     private String isbn;
     private List<String> publishers;
@@ -21,11 +19,25 @@ public class Book extends Product {
         authors = new ArrayList<>();
     }
 
-    public int getPageNumber() {
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Book)) {
+            return super.equals(o);
+        }
+        Book other = (Book) o;
+        return super.equals(other)
+                && pageNumber == null || other.getPageNumber() == null || pageNumber.equals(other.getPageNumber())
+                && publicationDate.isEqual(other.getPublicationDate())
+                && isbn == null || other.getIsbn() == null || isbn.equals(other.getIsbn())
+                && publishers.containsAll(other.getPublishers()) && other.getPublishers().containsAll(publishers)
+                && authors.containsAll(other.getAuthors()) && other.getAuthors().containsAll(authors);
+    }
+
+    public Integer getPageNumber() {
         return pageNumber;
     }
 
-    public void setPageNumber(int pageNumber) {
+    public void setPageNumber(Integer pageNumber) {
         this.pageNumber = pageNumber;
     }
 
@@ -63,5 +75,9 @@ public class Book extends Product {
 
     public void setAuthors(List<Person> authors) {
         this.authors = authors;
+    }
+
+    public void addAuthor(Person person) {
+        authors.add(person);
     }
 }

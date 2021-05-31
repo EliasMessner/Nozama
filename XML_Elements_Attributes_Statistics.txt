@@ -1,0 +1,302 @@
+Leipzig.xml:
+Elements
+studio: 1004
+shop: 1
+regioncode: 580
+audiotext: 2327
+artist: 1160
+creators: 2327
+directors: 2327
+isbn: 309
+binding: 1747
+edition: 309
+language: 833
+releasedate: 2018
+title: 35600
+dvdspec: 2327
+audioformat: 833
+listmania: 2327
+pages: 309
+artists: 2327
+price: 2327
+publication: 309
+publishers: 2327
+runningtime: 580
+sim_product: 2175
+theatr_release: 580
+item: 2327
+num_discs: 1438
+creator: 3112
+studios: 2327
+package: 309
+author: 441
+director: 201
+similars: 2327
+format: 2018
+upc: 2018
+label: 2384
+list: 3047
+bookspec: 2327
+tracks: 2327
+musicspec: 2327
+labels: 2327
+aspectratio: 580
+actor: 580
+actors: 2327
+publisher: 369
+asin: 2175
+authors: 2327
+
+Elementwerte > 50:
+: 42024
+0: 302
+1: 876
+2: 371
+3: 71
+Italienisch: 53
+CD: 1444
+16:9: 110
+Dolby,Surround Sound,PAL: 120
+not specified
+
+        : 173
+Gebundene Ausgabe: 172
+'Deed I Do: 63
+Französisch: 72
+Dolby Digital 2.0
+
+        : 66
+2. Andante: 53
+PAL: 101
+Broschiert: 55
+Dolby,PAL: 52
+2. Adagio: 59
+AC-3,PAL: 58
+Spanisch: 71
+Englisch: 309
+2005: 76
+2004: 57
+
+
+
+    : 161
+1. Allegro: 67
+not specified: 607
+Deutsch: 191
+Hörkassette: 57
+4:3: 266
+
+
+        : 6520
+Dolby Digital 5.1
+
+        : 68
+
+    : 2166
+Dolby Digital 2.0: 87
+
+        : 845
+Dolby Digital 5.1: 112
+
+Attributes
+zip: 1
+val: 1198
+date: 309
+mult: 2327
+detailpage: 2327
+length: 309
+weight: 309
+salesrank: 2327
+type: 833
+picture: 2327
+pgroup: 2327
+ean: 2327
+street: 1
+name: 12299
+asin: 2326
+currency: 2327
+state: 3080
+value: 1438
+height: 309
+
+Attributwerte > 20:
+: 3417
+&: 82
+1: 131
+0.01: 2327
+Deutsche G (Universal): 100
+Peter: 59
+Various Artists: 40
+Al: 108
+DVD: 580
+Rc: 43
+Va: 324
+Dav: 68
+EMI: 187
+EUR: 750
+not specified: 879
+Original Soundtrack: 21
+Naxos: 57
+MAXI-CD: 36
+DOPPEL-CD: 203
+Rca Red S. (Sony BMG): 33
+P.I.a.S. (rough trade): 27
+EMI Classi (EMI): 33
+new: 3080
+Edel records GmbH: 61
+Oetinger: 20
+Book: 309
+Meine Lieblingsbücher: 32
+Universal/Music: 104
+Scl (Sony BMG): 69
+Loewe Verlag: 27
+Antonio Vivaldi: 20
+Rca: 42
+Universal: 378
+SPV: 54
+Deutsche G: 101
+Warner Music Group Germany: 55
+Scl (Sony BM: 69
+Subtitled: 507
+Johann Sebastian Bach: 52
+Original Language: 314
+Decca (Universal): 54
+Universal/Music/DVD: 101
+Import: 58
+Edel: 67
+Various Artist: 41
+Philips (Universal): 23
+Box set: 126
+Indigo: 27
+Naxos (Naxos): 35
+Sony: 353
+2005-09-01: 25
+Canada (Megaphon Importservice): 32
+Wolfgang Amadeus Mozart: 42
+Teldec (Warner): 26
+Pinnacle I (rough trade): 51
+Music: 1438
+Sony BMG Music Entertainment GmbH: 126
+
+Dresden.xml:
+Elements
+studio: 363
+shop: 1
+regioncode: 214
+audiotext: 1328
+artist: 532
+creators: 1328
+directors: 1328
+isbn: 409
+binding: 1114
+edition: 409
+language: 420
+releasedate: 919
+title: 16734
+audioformat: 420
+dvdspec: 1328
+listmania: 1328
+ean: 1328
+pages: 409
+artists: 1328
+price: 1332
+publication: 409
+publishers: 1328
+details: 1328
+runningtime: 214
+theatr_release: 214
+item: 2635
+creator: 1342
+num_discs: 705
+studios: 1328
+package: 409
+director: 88
+author: 608
+similars: 1328
+format: 919
+upc: 919
+label: 1241
+list: 2304
+tracks: 1328
+bookspec: 1328
+labels: 1328
+aspectratio: 214
+musicspec: 1328
+actor: 217
+actors: 1328
+publisher: 459
+authors: 1328
+
+Elementwerte > 50:
+: 17088
+0: 130
+1: 487
+2: 130
+Deutsche G (Universal): 54
+Al: 59
+CD: 751
+Va: 162
+EMI: 103
+Gebundene Ausgabe: 186
+Scl (Sony BMG): 51
+Broschiert: 128
+Universal: 177
+not specified
+        : 81
+Englisch: 143
+Sony: 201
+Va
+        : 129
+not specified: 784
+DOPPEL-CD: 90
+Deutsch: 87
+Universal
+        : 176
+Deutsche G: 54
+Scl (Sony BM: 52
+4:3: 102
+Sony
+        : 200
+
+
+    : 233
+EMI
+        : 81
+Box set: 61
+
+    : 623
+Dolby Digital 2.0: 58
+
+        : 856
+
+
+Attribute
+zip: 1
+val: 1032
+date: 409
+img: 1328
+mult: 1332
+length: 409
+weight: 409
+salesrank: 1328
+type: 420
+pgroup: 1328
+street: 1
+name: 1
+asin: 2634
+currency: 1332
+state: 1332
+height: 409
+
+Attributwerte > 20:
+: 2635
+1: 148
+0.01: 1332
+new: 1328
+DVD: 214
+2005-09-01: 32
+EUR: 365
+Subtitled: 289
+Book: 408
+Original Language: 128
+Music: 704

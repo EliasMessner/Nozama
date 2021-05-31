@@ -2,8 +2,10 @@ package com.unileipzig.shop;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import static com.unileipzig.shop.CompareUtil.alphanumericallyEqualsIgnoreOrder;
+import static com.unileipzig.shop.CompareUtil.equalsAllowNull;
 
 public class MusicCd extends Product {
 
@@ -18,6 +20,19 @@ public class MusicCd extends Product {
         labels = new ArrayList<>();
         titles = new ArrayList<>();
         artists = new ArrayList<>();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof MusicCd)) {
+            return super.equals(o);
+        }
+        MusicCd other = (MusicCd) o;
+        return super.equals(other)
+                && alphanumericallyEqualsIgnoreOrder(labels, other.getLabels())
+                && equalsAllowNull(publicationDate, other.getPublicationDate())
+                && alphanumericallyEqualsIgnoreOrder(titles, other.getTitles())
+                && artists.containsAll(other.getArtists()) && other.getArtists().containsAll(artists);
     }
 
     public List<String> getLabels() {
@@ -58,5 +73,9 @@ public class MusicCd extends Product {
 
     public void setArtists(List<Person> artists) {
         this.artists = artists;
+    }
+
+    public void addArtist(Person person) {
+        artists.add(person);
     }
 }

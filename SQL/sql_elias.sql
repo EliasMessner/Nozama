@@ -12,7 +12,7 @@ CREATE TABLE store_inventory(
 	store_street VARCHAR,
 	store_zip CHAR(5),
 	article_condition VARCHAR NOT NULL,
-	price DECIMAL(10,2),
+	price DECIMAL(10,2) CHECK (price IS NULL OR price >= 0),
 	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store(s_name, street, zip)
 );
 
@@ -28,7 +28,7 @@ CREATE TABLE customer(
 CREATE TABLE sale(
 	customer VARCHAR REFERENCES customer(username),
     product VARCHAR REFERENCES product(prod_number),
-	dateTime TIMESTAMP,
+	dateTime TIMESTAMP CHECK(dateTime <= CURRENT_TIMESTAMP),
 	delivery_address VARCHAR NOT NULL,
 	bank_account VARCHAR NOT NULL,
 	PRIMARY KEY (customer, product, dateTime)
