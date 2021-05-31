@@ -61,4 +61,36 @@ public class ProductHandlerDresden extends ProductHandler {
                 break;
         }
     }
+
+    public void readPersonNamesAsTextElement(String uri, String localName, String qName) {
+        if (product instanceof MusicCd) {
+            switch (qName) {
+                case "label":
+                    ((MusicCd) product).addLabel(currentValue.toString());
+                    break;
+                case "artist":
+                    ((MusicCd) product).getArtists().add(new Person(currentValue.toString()));
+                    break;
+            }
+        } else if (product instanceof Book) {
+            switch (qName) {
+                case "publisher":
+                    ((Book) product).addPublisher(currentValue.toString());
+                case "author":
+                    ((Book) product).getAuthors().add(new Person(currentValue.toString()));
+            }
+        } else if (product instanceof Dvd) {
+            switch (qName) {
+                case "actor":
+                    ((Dvd) product).getActors().add(new Person(currentValue.toString()));
+                    break;
+                case "creator":
+                    ((Dvd) product).getCreators().add(new Person(currentValue.toString()));
+                    break;
+                case "director":
+                    ((Dvd) product).getDirectors().add(new Person(currentValue.toString()));
+                    break;
+            }
+        }
+    }
 }

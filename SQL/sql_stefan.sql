@@ -1,6 +1,6 @@
 CREATE TABLE person(
     id SERIAL PRIMARY KEY,
-    name VARCHAR
+    name VARCHAR NOT NULL
 );
 
 CREATE TABLE product(
@@ -54,7 +54,7 @@ CREATE TABLE cd_artist(
 
 CREATE TABLE category(
     id SERIAL PRIMARY KEY,
-    name VARCHAR
+    name VARCHAR NOT NULL
 );
 
 CREATE TABLE category_hierarchy(
