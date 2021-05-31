@@ -4,15 +4,24 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * helper class to connect to database
+ */
 // Goal of class: https://stackoverflow.com/questions/471745/how-many-jdbc-connections-in-java
 public class DatabaseConnector {
 
-    static Connection conn;
+    private static Connection conn;
 
+    /**
+     * @return connection to default database
+     */
     public static Connection getConnection(){
         return getConnection("test_1");
     }
 
+    /**
+     * @return connection to database passed as an argument
+     */
     public static Connection getConnection(String database){
         if (conn == null) {
             try {
