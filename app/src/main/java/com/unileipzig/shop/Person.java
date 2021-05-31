@@ -2,6 +2,9 @@ package com.unileipzig.shop;
 
 import static com.unileipzig.shop.CompareUtil.alphanumericallyEquals;
 
+/**
+ * model for table person
+ */
 public class Person {
 
     private int id;
@@ -16,6 +19,9 @@ public class Person {
         this.name = name;
     }
 
+    /**
+     * @return true if the names are equal in regards to only alphanumerical characters
+     */
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Person)) return super.equals(o);

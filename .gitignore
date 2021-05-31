@@ -2,3 +2,4 @@
 data/errors*.txt
 **/*.iml
 **/target
+**/javadoc

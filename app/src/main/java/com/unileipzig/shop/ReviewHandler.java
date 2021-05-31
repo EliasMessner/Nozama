@@ -8,11 +8,14 @@ import java.io.*;
 import java.sql.*;
 import java.util.List;
 
+/**
+ * class for retrieving reviews from csv files
+ */
 public class ReviewHandler {
 
-    String inputPath;
-    Connection conn;
-    PrintWriter printWriter;
+    private String inputPath;
+    private Connection conn;
+    private PrintWriter printWriter;
 
     ReviewHandler(String inputPath, Connection conn, String errorPath) throws IOException {
         this.inputPath = inputPath;
@@ -20,6 +23,9 @@ public class ReviewHandler {
         this.printWriter = new PrintWriter(new FileWriter(errorPath));
     }
 
+    /**
+     * retrieves reviews and corresponding customers from csv file and writes them to the database
+     */
     public void handle() {
         try {
             List<String[]> listOfLines = this.readFromCsV();
@@ -48,8 +54,6 @@ public class ReviewHandler {
             conn.setAutoCommit(false);
             for (String[] line : listOfLines) {
                 try {
-                    conn.setAutoCommit(false);
-
                     if (!line[4].equals("guest")) {
                         pStmtCustomerSelect.setString(1, line[4]);
                         ResultSet resultSet = pStmtCustomerSelect.executeQuery();

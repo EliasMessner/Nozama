@@ -6,12 +6,24 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.sql.Connection;
 
+/**
+ * subclass for retrieving data from dresden.xml
+ */
 public class ProductHandlerDresden extends ProductHandler {
 
+    /**
+     *
+     * @param conn
+     * @param errorPath
+     * @throws IOException
+     */
     public ProductHandlerDresden(Connection conn, String errorPath) throws IOException {
         super(conn, errorPath);
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
@@ -20,6 +32,9 @@ public class ProductHandlerDresden extends ProductHandler {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void readBookTextElements(String qName) {
         super.readBookTextElements(qName);
@@ -33,6 +48,9 @@ public class ProductHandlerDresden extends ProductHandler {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void readMusicCdTextElements(String qName) {
         super.readMusicCdTextElements(qName);
@@ -46,6 +64,9 @@ public class ProductHandlerDresden extends ProductHandler {
         }
     }
 
+    /**
+     * @inheritDoc
+     */
     @Override
     protected void readDvdTextElements(String qName) {
         super.readDvdTextElements(qName);
