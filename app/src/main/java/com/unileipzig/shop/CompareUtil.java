@@ -1,5 +1,8 @@
 package com.unileipzig.shop;
 
+/**
+ * Class holding some util methods for comparing Strings or other objects in a specific way.
+ */
 public class CompareUtil {
 
     /**

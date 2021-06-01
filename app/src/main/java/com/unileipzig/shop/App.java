@@ -8,8 +8,7 @@ import java.io.IOException;
 import java.sql.Connection;
 
 /**
- * Hello world!
- *
+ * The Main-Application. Holds all the file paths and the main method.
  */
 public class App {
 
@@ -18,6 +17,10 @@ public class App {
     private static final String FILENAME_CATEGORIES = "/data/categories.xml";
     private static final String FILENAME_REVIEWS = "/data/reviews.csv";
 
+    /**
+     * The main-method. Serves as entry point, initializes the file-handlers, executes the parses.
+     * @param args
+     */
     public static void main( String[] args )
     {
         SAXParserFactory factory = SAXParserFactory.newInstance();
