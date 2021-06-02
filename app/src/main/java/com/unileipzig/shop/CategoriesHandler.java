@@ -37,7 +37,7 @@ public class CategoriesHandler extends DefaultHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
@@ -49,7 +49,7 @@ public class CategoriesHandler extends DefaultHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     public void startDocument() {
@@ -58,7 +58,7 @@ public class CategoriesHandler extends DefaultHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     public void startElement(String uri, String lName, String qName, Attributes attr) throws SAXException {
@@ -81,7 +81,7 @@ public class CategoriesHandler extends DefaultHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
@@ -98,7 +98,7 @@ public class CategoriesHandler extends DefaultHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     public void endDocument() throws SAXException {

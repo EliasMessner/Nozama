@@ -22,7 +22,7 @@ public class ProductHandlerDresden extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
@@ -33,7 +33,7 @@ public class ProductHandlerDresden extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     protected void readBookTextElements(String qName) {
@@ -49,7 +49,7 @@ public class ProductHandlerDresden extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     protected void readMusicCdTextElements(String qName) {
@@ -65,7 +65,7 @@ public class ProductHandlerDresden extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     *{@inheritDoc}
      */
     @Override
     protected void readDvdTextElements(String qName) {
