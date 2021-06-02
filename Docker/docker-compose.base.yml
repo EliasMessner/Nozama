@@ -5,7 +5,7 @@ services:
         environment:
             POSTGRES_PASSWORD: example
         networks:
-                - bridge_network
+            - bridge_network
                 
     adminer:
         image: adminer
@@ -13,15 +13,6 @@ services:
             - 8080:8080
         networks:
             - bridge_network
-    
-    application:
-        build:
-            context: ..
-            dockerfile: Docker/Dockerfile
-        networks:
-            - bridge_network
-        depends_on:
-            - db
         
 networks:
     bridge_network:

@@ -4,21 +4,41 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Helper class for parsing the categories.xml file and writing the values to the database.
+ */
 public class CategoriesHandler extends DefaultHandler {
-    private static final String CATEGORIES = "categories";
-    private static final String CATEGORY = "category";
-    private static final String ITEM = "item";
 
-    private StringBuilder elementValue;
-    private ArrayList<Category> categories;
-    private Category current = null;
+    protected static final String CATEGORIES = "categories";
+    protected static final String CATEGORY = "category";
+    protected static final String ITEM = "item";
+    protected StringBuilder elementValue;
+    protected ArrayList<Category> categories;
+    protected Category current = null;
+    protected Connection conn;
+    protected PrintWriter printWriter;
 
+    /**
+     * Constructs an Instance of a CategoriesHandler, must be passed an established SQL connection and a file path
+     * for writing error messages to.
+     * @param conn an established SQL connection.
+     * @param errorPath file path for writing error messages to.
+     */
+    public CategoriesHandler(Connection conn, String errorPath) throws IOException {
+        this.printWriter = new PrintWriter(new FileWriter(errorPath));
+        this.conn = conn;
+    }
+
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         if (elementValue == null) {
@@ -28,18 +48,21 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
-    public void startDocument() throws SAXException {
+    public void startDocument() {
         elementValue = new StringBuilder();
         categories = new ArrayList<>();
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void startElement(String uri, String lName, String qName, Attributes attr) throws SAXException {
         switch (qName) {
-            case CATEGORIES:
-
-                break;
             case CATEGORY:
                 addCategoryNameIfNotSet();
                 Category c = new Category();
@@ -54,8 +77,12 @@ public class CategoriesHandler extends DefaultHandler {
                 addCategoryNameIfNotSet();
                 break;
         }
+        elementValue.setLength(0);
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         switch (qName) {
@@ -70,24 +97,30 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
+    /**
+     *{@inheritDoc}
+     */
+    @Override
+    public void endDocument() throws SAXException {
+        super.endDocument();
+        writeToDataBase();
+        printWriter.close();
+    }
+
     private void addCategoryNameIfNotSet() {
-        if (!elementValue.isEmpty()) {
+        if (!elementValue.toString().isBlank()) {
             current.setName(elementValue.toString());
             elementValue = new StringBuilder();
         }
     }
 
-    /**
-     * should be called after the xml document is parsed
-     * @param conn the sql connection
-     */
-    public void writeToDataBase(Connection conn) {
+    private void writeToDataBase() {
         addCategoriesRecursively(categories, conn, null);
     }
 
     private void addCategoriesRecursively(Collection<Category> categories, Connection conn, Category parent) {
         for (Category category : categories) {
-            addCategory(category, conn);
+            addCategoryAndSetID(category, conn);
             setSubCategory(parent, category, conn);
             for (String item : category.getItems()) {
                 addItemToCategory(item, category, conn);
@@ -96,49 +129,49 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
-    private void addCategory(Category category, Connection conn) {
-        String insertQuery = "INSERT INTO category (name, is_main) VALUES (?, ?)";
-        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+    private void addCategoryAndSetID(Category category, Connection conn) {
+        String insertQuery = "INSERT INTO category (name) VALUES (?)";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
             insertStmt.setString(1, category.getName());
             insertStmt.executeUpdate();
+            ResultSet generatedKeys = insertStmt.getGeneratedKeys();
+            generatedKeys.next();
+            category.setID(generatedKeys.getInt(1));
         } catch (SQLException e) {
-            //TODO handle SQL Exception
+            e.printStackTrace();
+            printWriter.println(e.getMessage());
         }
 
     }
 
-    private boolean addItemToCategory(String prod_num_str, Category category, Connection conn) {
-        String response = checkProductNumber(prod_num_str);
-        if (!response.equals("OK")) {
-            // TODO handle bad response
-            return false;
-        }
-        int product_number = Integer.parseInt(prod_num_str);
+    private boolean addItemToCategory(String product_number, Category category, Connection conn) {
         String insertQuery = "INSERT INTO product_category (product, category) VALUES (?, ?)";
         try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-            insertStmt.setInt(1, product_number);
-            insertStmt.setString(2, category.getName());
+            insertStmt.setString(1, product_number);
+            insertStmt.setInt(2, category.getID());
             insertStmt.executeUpdate();
-            return true;
         } catch (SQLException e) {
-            //TODO handle SQL Exception
+            e.printStackTrace();
+            printWriter.println(e.getMessage());
             return false;
         }
+        return true;
     }
 
-    private void setSubCategory(Category parent, Category child, Connection conn) {
+    private boolean setSubCategory(Category parent, Category child, Connection conn) {
         if (parent == null) {
-            return;
+            return true;
         }
-        //TODO SQL stuff
-    }
-
-    private String checkProductNumber(String prod_num_str) {
-        try {
-            Integer.parseInt(prod_num_str);
-        } catch (NumberFormatException e) {
-            return e.getMessage();
+        String insertQuery = "INSERT INTO category_hierarchy (super_category, sub_category) VALUES (?, ?)";
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+            insertStmt.setInt(1, parent.getID());
+            insertStmt.setInt(2, child.getID());
+            insertStmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            printWriter.println(e.getMessage());
+            return false;
         }
-        return "OK";
+        return true;
     }
 }

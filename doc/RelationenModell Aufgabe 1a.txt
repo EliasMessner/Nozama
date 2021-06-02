@@ -1,57 +1,42 @@
-Produkt(ProdNr:PK, Titel NOT NULL, Rating NOT NULL, Verkaufsrang NOT NULL, Bild)
+person(ID:PK, name NOT NULL)
 
-Buch(ProdNr:PK, Autor: FK REF Person, Seitenzahl NOT NULL, Ersch_Datum NOT NULL, isbn UNIQUE NOT NULL, Verlag NOT NULL,
-	ProdNr FK REF Produkt(ProdNr))
+Product(prod_number:PK, title NOT NULL, rating NOT NULL, sales_rank NOT NULL, image)
 
-DVD(ProdNr:PK, Format, Laufzeit, Region_Code,
-	ProdNr FK REF Produkt(ProdNr))
+Book(prod_number:PK, page_number, publication_date, isbn UNIQUE, publishers,
+	prod_number FK REF Product(prod_number))
 
-Musik_CD(ProdNr:PK, Label NOT NULL, Ersch_Datum NOT NULL, Titel,
-	ProdNr FK REF Produkt(ProdNr))
+dvd(prod_number:PK, format, duration_minutes, region_code NOT NULL, prod_number FK REF Product(prod_number))
 
-DVD_Person(Dvd:PK, Person:PK, Rolle:PK,
-	DVD FK REF DVD(ProdNr), Person FK REF Person(ID))
+Music_cd(prod_number:PK, labels, titles, publication_date, prod_number FK REF Product(prod_number))
 
-CD_Kuenstler(Cd:PK, Kuenstler:PK,
-	Cd FK REF Musik_CD(ProdNr), Kuenstler FK REF Person(PersID))
+Book_author(book: FK REF book(prod_number), author: FK REF person(id), PK (book, author))
 
-Person(ID:PK, Vorname NOT NULL, Nachname NOT NULL)
+dvd_person(dvd:PK, person:PK, role:PK,
+	dvd FK REF dvd(prod_number), person FK REF person(id))
 
-Kategorie(Name:PK)
+CD_artist(Cd:PK, artist:PK,
+	Cd FK REF music_CD(prod_number), artist FK REF person(PersID))
 
-Kategorie_Hierarchie(Ueberkategorie:PK, Unterkategorie:PK,
-	Ueberkategorie FK REF Kategorie(Name), Unterkategorie FK REF Kategorie(Name)
+category(id:PK, name NOT NULL)
 
-Produkt_Kategorie(Produkt:PK, Kategorie:PK,
-	Produkt FK REF Produkt(ProdNr), Kategorie FK REF Kategorie(Name))
+category_hierarchy(super_category: FK REF category(id), sub_category: FK REF category(id),
+	PK (super_category, sub_category))
 
-################
+product_category(product: FK REF product(prod_number), category:FK REF category(id),
+	PK(product, category))
 
-Filiale(Name:PK, Anschrift:PK)
+store(n_name, street, zip, PK (sname, street, zip))
 
-Filialen_Angebot(ArtID:PK, FilName, FilAnschrift, Preis, Zustand NOT NULL
-	ProdID FK REF Produkt, (FilName, FilAnschrift) FK REF Filiale)
+store_inventory(artID:PK, product FK REF product(prod_number), store_name, store_street, store_zip, price,
 
-Kunde(KundenNr:PK, Vorname NOT NULL, Nachname NOT NULL, letzteKontoNr NOT NULL, letzteLieferAdresse NOT NULL)
+article_condition NOT NULL, (store_name, store_street, store_zip) FK REF store)
 
-Kauf(KundenNr:PK, ProdID:PK, KaufZeitpunkt:PK, Lieferadresse, KontoNr,
-	KundenNr FK REF Kunde, ProdID FK REF Artikel)
+customer(username:PK, first_name, last_name, bank_account, street, zip)
 
-Bewertung(KundenNr:PK, ProdID:PK, Rezension, SterneAnzahl NOT NULL,
-	KundenNr FK REF Kunde, ProdID FK REF Produkt)
+sale(username:PK, product:PK, dateTime:PK, delivery_address NOT NULL, bank_account NOT NULL,
+	username FK REF customer, product FK REF product)
 
-Relation "ähnliche produkte" ist symmetrisch. Deswegen benötigen wir Check-Bedingung ProdID1<ProdID2:
+review(id PK, customer, product, date, summary, details, stars NOT NULL,
+	customer FK REF customer, product FK REF product)
 
-AehnlicheProdukte(ProdID1:PK, ProdID2:PK, anzahlGemeineKategorien NOT NULL,
-	ProdID1 FK REF Produkt, ProdID2 FK REF Produkt)
-
-Integritätsbedingungen:
-Update von AehnlicheProdukte bei insert, delete in produkt, MusikCD, DVD, Buch oder bei insert/delete in istInKategorie.
-Produkt:
-	Rating ist Durchschnitt aus allen Bewertungen für dieses Produkt
-Buch: 	Ersch_Datum <= Heute
-	Seitenzahl > 0
-DVD:	Laufzeit > 0
-CD: 	Ersch_Datum <= Heute
-DVD_Person_Beteiligung:
-	Rolle IN ('A', 'C', 'D') //Actor, Creator, Director
+similar_products(product1 FK REF product, product2 FK REF product, PK(product1, product2))

@@ -1,0 +1,13 @@
+version: "3.3"
+
+services:
+    psqlseed:
+        build:
+            context: ./
+            dockerfile: ./psqlseed.Dockerfile
+        volumes:
+            - ../SQL/:/SQL/
+        networks:
+            - bridge_network
+        depends_on:
+            - db
