@@ -20,7 +20,7 @@ public class ProductHandlerLeipzig extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void readDvdAttributes(String qName, Attributes attributes) {
@@ -38,7 +38,7 @@ public class ProductHandlerLeipzig extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void readMusicCdAttributes(String qName, Attributes attributes) {
@@ -55,7 +55,7 @@ public class ProductHandlerLeipzig extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void readBookAttributes(String qName, Attributes attributes) {
@@ -73,7 +73,7 @@ public class ProductHandlerLeipzig extends ProductHandler {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override
     protected void startItemTag(Attributes attributes) {

@@ -11,22 +11,34 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Helper class for parsing the categories.xml file and writing the values to the database.
+ */
 public class CategoriesHandler extends DefaultHandler {
+
     protected static final String CATEGORIES = "categories";
     protected static final String CATEGORY = "category";
     protected static final String ITEM = "item";
-
     protected StringBuilder elementValue;
     protected ArrayList<Category> categories;
     protected Category current = null;
     protected Connection conn;
     protected PrintWriter printWriter;
 
+    /**
+     * Constructs an Instance of a CategoriesHandler, must be passed an established SQL connection and a file path
+     * for writing error messages to.
+     * @param conn an established SQL connection.
+     * @param errorPath file path for writing error messages to.
+     */
     public CategoriesHandler(Connection conn, String errorPath) throws IOException {
         this.printWriter = new PrintWriter(new FileWriter(errorPath));
         this.conn = conn;
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         if (elementValue == null) {
@@ -36,12 +48,18 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
-    public void startDocument() throws SAXException {
+    public void startDocument() {
         elementValue = new StringBuilder();
         categories = new ArrayList<>();
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void startElement(String uri, String lName, String qName, Attributes attr) throws SAXException {
         switch (qName) {
@@ -62,6 +80,9 @@ public class CategoriesHandler extends DefaultHandler {
         elementValue.setLength(0);
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
         switch (qName) {
@@ -76,6 +97,9 @@ public class CategoriesHandler extends DefaultHandler {
         }
     }
 
+    /**
+     *{@inheritDoc}
+     */
     @Override
     public void endDocument() throws SAXException {
         super.endDocument();
