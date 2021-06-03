@@ -115,6 +115,7 @@ public abstract class ProductHandler extends DefaultHandler {
                     offer.setPrice(parsePrice());
             }
         } catch (SQLException e) {
+            printWriter.println(e.getMessage());
             e.printStackTrace();
         }
         this.readProductTextElements(qName);
