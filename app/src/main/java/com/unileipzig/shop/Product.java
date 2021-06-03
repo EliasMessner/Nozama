@@ -40,7 +40,7 @@ public class Product {
                 && alphanumericallyEquals(title, other.getTitle())
                 && rating == other.getRating()
                 && equalsAllowNull(image, other.getImage())  // because img can be null
-                && salesRank == (other.getSalesRank());
+                && equalsAllowNull(salesRank, other.getSalesRank());
                 // ignore all special characters and whitespaces when comparing titles because they might be formatted
                 // incorrectly. When prodNumber matches and title matches except for special characters, we can assume
                 // they are the same product
