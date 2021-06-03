@@ -78,6 +78,7 @@ public class ProductHandlerLeipzig extends ProductHandler {
     @Override
     protected void startItemTag(Attributes attributes) {
         super.startItemTag(attributes);
-        product.setImage(attributes.getValue("picture"));
+        if (attributeValueIsSpecified(attributes.getValue("picture")))
+            product.setImage(attributes.getValue("picture"));
     }
 }

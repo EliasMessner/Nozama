@@ -115,6 +115,7 @@ public abstract class ProductHandler extends DefaultHandler {
                     offer.setPrice(parsePrice());
             }
         } catch (SQLException e) {
+            printWriter.println(e.getMessage());
             e.printStackTrace();
         }
         this.readProductTextElements(qName);
@@ -162,7 +163,7 @@ public abstract class ProductHandler extends DefaultHandler {
             default:
                 printWriter.println("ERROR: product type " + attributes.getValue("pgroup") + " does not exist.");
         }
-        if (!attributes.getValue("salesrank").isBlank()) {
+        if (attributeValueIsSpecified(attributes.getValue("salesrank"))) {
             product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
         }
         offer = new Offer(product, shop);
@@ -287,7 +288,7 @@ public abstract class ProductHandler extends DefaultHandler {
                     "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
             pStmt0.setString(1, product.getProdNumber());
             pStmt0.setString(2, product.getTitle());
-            pStmt0.setInt(3, product.getSalesRank());
+            pStmt0.setObject(3, product.getSalesRank(), Types.INTEGER);
             pStmt0.setString(4, product.getImage());
             pStmt0.executeUpdate();
         }
