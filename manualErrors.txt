@@ -1,1 +1,10 @@
 Falsche Produkt-Gruppe: <item pgroup="Buch" asin="3551065020" salesrank="1329">
+
+Error Types:
+
+Foreign Key not present (11x)
+Duplicate Key (3x)
+Not-Null Constraint violated (5x)
+Product Type does not exist (1x Musical + 1x Buch)
+Price Check violated (1x, Price = -10.00)
+(Salesrank not set)
