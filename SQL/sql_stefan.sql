@@ -7,7 +7,7 @@ CREATE TABLE product(
     prod_number VARCHAR PRIMARY KEY,
     title VARCHAR NOT NULL,
     rating DOUBLE PRECISION NOT NULL,
-    sales_rank INT NOT NULL,
+    sales_rank INT,
     image VARCHAR
 );
 

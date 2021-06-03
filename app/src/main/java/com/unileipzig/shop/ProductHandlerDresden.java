@@ -28,7 +28,8 @@ public class ProductHandlerDresden extends ProductHandler {
     public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
         super.startElement(uri, localName, qName, attributes);
         if (qName.equals("details")) {
-            product.setImage(attributes.getValue("img"));
+            if (attributeValueIsSpecified(attributes.getValue("img")))
+                product.setImage(attributes.getValue("img"));
         }
     }
 

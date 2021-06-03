@@ -11,7 +11,7 @@ public class Product {
     private String prodNumber;
     private String title;
     private double rating;
-    private int salesRank;
+    private Integer salesRank;
     private String image;
 
     /**
@@ -66,11 +66,11 @@ public class Product {
         this.rating = rating;
     }
 
-    public int getSalesRank() {
+    public Integer getSalesRank() {
         return salesRank;
     }
 
-    public void setSalesRank(int salesRank) {
+    public void setSalesRank(Integer salesRank) {
         this.salesRank = salesRank;
     }
 
