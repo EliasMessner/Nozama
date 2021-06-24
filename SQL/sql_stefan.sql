@@ -15,7 +15,7 @@ CREATE TABLE book(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     page_number INT CHECK(page_number IS NULL OR page_number > 0),
     publication_date DATE,
-    isbn VARCHAR UNIQUE,
+    isbn VARCHAR UNIQUE CHECK(length(isbn) = 10 OR length(isbn) = 13),
     publishers VARCHAR ARRAY
 );
 
