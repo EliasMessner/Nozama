@@ -191,6 +191,8 @@ public abstract class ProductHandler extends DefaultHandler {
         } finally {
             conn.setAutoCommit(true);
         }
+        offers = new ArrayList<>();
+        currentOffer = null;
     }
 
     protected void readProductAttributes(String qName, Attributes attributes) {
@@ -307,8 +309,6 @@ public abstract class ProductHandler extends DefaultHandler {
         for (Offer offer : offers) {
             persistOffer(offer);
         }
-        offers = new ArrayList<>();
-        currentOffer = null;
     }
 
     private void persistOffer(Offer offer) throws SQLException {
