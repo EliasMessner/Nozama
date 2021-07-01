@@ -1,3 +1,11 @@
+-- task 1
+SELECT (SELECT COUNT(*)
+        FROM music_cd) music_cd_count,
+       (SELECT COUNT(*)
+        FROM dvd) dvd_count,
+       (SELECT COUNT(*)
+        FROM book) book_count;
+
 -- task 2
 SELECT *
 FROM (
@@ -21,6 +29,13 @@ FROM (
      ) AS products
 ORDER BY type ASC, rating DESC;
 
+-- task 3
+SELECT *
+FROM product
+WHERE prod_number
+NOT IN (SELECT product
+    FROM store_inventory);
+
 -- task 4
 SELECT DISTINCT product
 FROM store_inventory AS inv1
@@ -32,6 +47,22 @@ HAVING MAX(price)/2 >
         ORDER BY price ASC
         LIMIT 1);
 
+-- task 5
+SELECT *
+FROM product p
+WHERE EXISTS (
+    SELECT *
+    FROM review
+    WHERE product = p.prod_number
+    AND stars = 1
+    )
+AND EXISTS (
+    SELECT *
+    FROM review
+    WHERE product = p.prod_number
+    AND stars = 5
+    );
+
 -- task 6
 SELECT prod_number
 FROM product
@@ -39,6 +70,15 @@ WHERE NOT EXISTS
     (SELECT *
     FROM review
     WHERE review.product = product.prod_number);
+
+-- task 7
+SELECT *
+FROM customer c
+WHERE 10 = (
+    SELECT COUNT(*)
+    FROM review
+    WHERE customer = c.username
+          );
 
 -- task 8
 SELECT DISTINCT name
@@ -51,6 +91,14 @@ WHERE person.id IN (
      FROM book_author JOIN cd_artist ON author = artist)
 )
 ORDER BY name ASC;
+
+-- task 9
+SELECT AVG(card)
+FROM (
+    SELECT cardinality(titles) card
+    FROM music_cd
+    GROUP BY prod_number
+    ) cardinalities;
 
 -- task 10
 WITH RECURSIVE main_category_mapping (sub_category, main_category, level) AS
@@ -67,6 +115,20 @@ WHERE EXISTS
            FROM similar_products AS sp JOIN product_category AS pc2 ON pc2.product = sp.product2 JOIN main_category_mapping AS mc2
                                                                                                       ON pc2.category = mc2.sub_category
            WHERE sp.product1 = pc1.product AND mc1.main_category != mc2.main_category);
+
+-- task 11
+SELECT *
+FROM product p
+WHERE NOT EXISTS(
+    SELECT *
+    FROM store s
+    WHERE p.prod_number
+    NOT IN (
+        SELECT product
+        FROM store_inventory
+        WHERE store_name = s.s_name AND store_street = s.street AND store_zip = s.zip
+              )
+    );
 
 -- task 12
 -- leipzig_and_dresden assignment needs to be replaced by solution of task 11
