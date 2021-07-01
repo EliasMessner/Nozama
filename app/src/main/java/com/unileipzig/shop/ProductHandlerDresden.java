@@ -57,6 +57,8 @@ public class ProductHandlerDresden extends ProductHandler {
         super.readMusicCdTextElements(qName);
         switch (qName) {
             case "artist":
+            case "author":
+            case "creator":
                 ((MusicCd) product).addArtist(new Person(currentValue.toString()));
                 break;
             case "label":
