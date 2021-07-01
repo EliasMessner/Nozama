@@ -3,6 +3,8 @@ CREATE TABLE person(
     name VARCHAR NOT NULL
 );
 
+CREATE INDEX ON person (name);
+
 CREATE TABLE product(
     prod_number VARCHAR PRIMARY KEY,
     title VARCHAR NOT NULL,
@@ -10,6 +12,8 @@ CREATE TABLE product(
     sales_rank INT,
     image VARCHAR
 );
+
+CREATE INDEX ON product (title);
 
 CREATE TABLE book(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
@@ -56,6 +60,8 @@ CREATE TABLE category(
     id SERIAL PRIMARY KEY,
     name VARCHAR NOT NULL
 );
+
+CREATE INDEX ON category (name);
 
 CREATE TABLE category_hierarchy(
     super_category INT REFERENCES category(id),

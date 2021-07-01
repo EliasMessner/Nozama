@@ -16,6 +16,8 @@ CREATE TABLE store_inventory(
 	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store(s_name, street, zip)
 );
 
+CREATE INDEX ON store_inventory (product);
+
 CREATE TABLE customer(
 	username VARCHAR PRIMARY KEY,
 	first_name VARCHAR,
@@ -43,6 +45,8 @@ CREATE TABLE review(
 	summary VARCHAR,
 	details TEXT
 );
+
+CREATE INDEX ON review (product);
 
 CREATE TABLE similar_products(
 	product1 VARCHAR REFERENCES product(prod_number),
