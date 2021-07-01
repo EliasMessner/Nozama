@@ -74,3 +74,19 @@ CREATE TABLE product_category(
     category INT REFERENCES category(id),
     PRIMARY KEY(product,category)
 );
+
+CREATE OR REPLACE FUNCTION check_one_artist() RETURNS TRIGGER AS $BODY$
+DECLARE
+selected_cd music_cd%rowtype;
+BEGIN
+SELECT cd INTO selected_cd FROM cd_artist WHERE cd = NEW.prod_number LIMIT 1;
+IF NOT FOUND THEN RAISE EXCEPTION 'At least one artist required for cd %', NEW.prod_number; END IF;
+RETURN NULL;
+END;
+$BODY$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER one_artist
+    AFTER INSERT ON music_cd
+    INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE FUNCTION check_one_artist();
