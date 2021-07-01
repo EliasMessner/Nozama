@@ -49,6 +49,8 @@ public class ProductHandlerLeipzig extends ProductHandler {
                 }
                 break;
             case "artist":
+            case "author":
+            case "creator":
                 ((MusicCd) product).addArtist(new Person(attributes.getValue("name")));
                 break;
         }
