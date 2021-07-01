@@ -70,3 +70,24 @@ CREATE TRIGGER calculate_avg_rating
 	AFTER INSERT OR UPDATE ON review
 	FOR EACH ROW
 	EXECUTE PROCEDURE calculate_avg_rating();
+
+
+CREATE OR REPLACE FUNCTION check_exists_as_subtype() RETURNS TRIGGER AS $BODY$
+BEGIN
+    IF new.prod_number IN (
+        SELECT prod_number FROM music_cd
+        UNION SELECT prod_number FROM dvd
+        UNION SELECT prod_number FROM book) THEN
+        RETURN NEW;
+    ELSE
+        RAISE EXCEPTION 'Product (%) must exists as subtype', new.prod_number;
+    END IF;
+END;
+$BODY$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER check_exists_as_subtype
+    AFTER INSERT OR UPDATE
+    ON product
+    DEFERRABLE INITIALLY DEFERRED
+    FOR EACH ROW
+EXECUTE PROCEDURE check_exists_as_subtype();
