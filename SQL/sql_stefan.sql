@@ -23,8 +23,6 @@ CREATE TABLE book(
     publishers VARCHAR ARRAY
 );
 
-CREATE INDEX ON book (isbn);
-
 CREATE TABLE dvd(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     format VARCHAR,
