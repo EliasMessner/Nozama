@@ -91,3 +91,7 @@ CREATE CONSTRAINT TRIGGER check_exists_as_subtype
     DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW
 EXECUTE PROCEDURE check_exists_as_subtype();
+
+CREATE INDEX ON review (customer);
+
+CREATE INDEX ON store_inventory (store_name, store_street, store_zip);
