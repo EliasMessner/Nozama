@@ -21,7 +21,8 @@ public abstract class ProductHandler extends DefaultHandler {
 
     protected StringBuilder currentValue = new StringBuilder();
     protected Product product;
-    protected Offer offer;
+    protected Offer currentOffer;
+    protected List<Offer> offers = new ArrayList<>();
     protected boolean tracks = false;
     protected boolean similars = false;
     protected PrintWriter printWriter;
@@ -87,8 +88,10 @@ public abstract class ProductHandler extends DefaultHandler {
                 similars = true;
                 break;
             case "price":
+                currentOffer = new Offer(product, shop);
+                offers.add(currentOffer);
                 if (this.attributeValueIsSpecified(attributes.getValue("state"))) {
-                    offer.setArticleCondition(attributes.getValue("state"));
+                    currentOffer.setArticleCondition(attributes.getValue("state"));
                 }
                 break;
         }
@@ -112,7 +115,7 @@ public abstract class ProductHandler extends DefaultHandler {
                     similars = false;
                     break;
                 case "price":
-                    offer.setPrice(parsePrice());
+                    currentOffer.setPrice(parsePrice());
             }
         } catch (SQLException e) {
             printWriter.println(e.getMessage());
@@ -166,7 +169,6 @@ public abstract class ProductHandler extends DefaultHandler {
         if (attributeValueIsSpecified(attributes.getValue("salesrank"))) {
             product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
         }
-        offer = new Offer(product, shop);
     }
 
     /**
@@ -180,7 +182,7 @@ public abstract class ProductHandler extends DefaultHandler {
             this.persistProduct();
             this.persistPersonAndRelations();
             conn.commit(); // commit here already because if only persistOffer fails we still want to keep the product
-            this.persistOffer();
+            this.persistOffers();
             conn.commit();
         } catch (SQLException throwables) {
             conn.rollback();
@@ -301,7 +303,15 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    private void persistOffer() throws SQLException {
+    private void persistOffers() throws SQLException {
+        for (Offer offer : offers) {
+            persistOffer(offer);
+        }
+        offers = new ArrayList<>();
+        currentOffer = null;
+    }
+
+    private void persistOffer(Offer offer) throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store_inventory (product, " +
                 "store_name, store_street, store_zip, article_condition, price) VALUES (?, ?, ?, ?, ?, ?)");
         pStmt.setString(1, offer.getProduct().getProdNumber());
