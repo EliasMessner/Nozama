@@ -98,7 +98,6 @@ SELECT AVG(card)
 FROM (
     SELECT cardinality(titles) card
     FROM music_cd
-    GROUP BY prod_number
     ) cardinalities;
 
 -- task 10
@@ -128,20 +127,36 @@ WHERE NOT EXISTS(
         SELECT product
         FROM store_inventory
         WHERE store_name = s.s_name AND store_street = s.street AND store_zip = s.zip
+        AND price IS NOT NULL
               )
     );
 
 -- task 12
--- leipzig_and_dresden assignment needs to be replaced by solution of task 11
 WITH
-    leipzig_and_dresden AS (SELECT prod_number FROM product),
+    leipzig_and_dresden AS (SELECT *
+                            FROM product p
+                            WHERE NOT EXISTS(
+                                    SELECT *
+                                    FROM store s
+                                    WHERE p.prod_number
+                                              NOT IN (
+                                              SELECT product
+                                              FROM store_inventory
+                                              WHERE store_name = s.s_name AND store_street = s.street AND store_zip = s.zip
+                                                AND price IS NOT NULL
+                                          )
+                                )),
     leipzig_and_dresden_count AS (SELECT COUNT(*) AS product_count FROM leipzig_and_dresden),
     leipzig_cheapest AS (SELECT COUNT(*) AS leipzig_cheapest_count
-                         FROM store_inventory AS si1
-                         WHERE si1.store_name = 'Leipzig'
-                           AND si1.product IN (SELECT prod_number FROM leipzig_and_dresden)
-                           AND si1.price = (SELECT MIN(price) FROM store_inventory AS si2 WHERE si2.product = si1.product))
-SELECT CAST(leipzig_cheapest.leipzig_cheapest_count AS float) / leipzig_and_dresden_count.product_count AS ratio
-FROM leipzig_cheapest, leipzig_and_dresden_count
-
-
+                        FROM leipzig_and_dresden WHERE (
+                            (SELECT MIN(price)
+                            FROM store_inventory si
+                            WHERE si.product = leipzig_and_dresden.prod_number
+                            AND si.store_name = 'Leipzig')
+                            <
+                            (SELECT MIN(price)
+                            FROM store_inventory si
+                            WHERE si.product = leipzig_and_dresden.prod_number
+                            AND si.store_name = 'Dresden')))
+SELECT CAST(leipzig_cheapest.leipzig_cheapest_count AS float) / leipzig_and_dresden_count.product_count
+FROM leipzig_cheapest, leipzig_and_dresden_count;
