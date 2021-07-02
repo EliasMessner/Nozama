@@ -1,0 +1,103 @@
+#1
+music_cd_count,dvd_count,book_count
+1926,689,716
+
+#2
+type,prod_number,rating
+book,3789133051,5
+book,B000850GZQ,5
+book,3785553390,5
+book,3785537999,5
+book,B00006L746,5
+dvd,B000BGHBK0,5
+dvd,B00065VRX8,5
+dvd,B00007BKGQ,5
+dvd,B00005UVZN,5
+dvd,B00006JI4U,5
+music_cd,B00005QTO5,5
+music_cd,B000C5RRQI,5
+music_cd,B0007GFG5Q,5
+music_cd,B000AYQDW0,5
+music_cd,B00007G75C,5
+
+#3
+2,345 rows
+prod_number,title,rating,sales_rank,image
+B0000668PG,In a Pig's Eye: Reflections on the Police State Re,3,,http://images.amazon.com/images/P/B0000668PG.01._SCMZZZZZZZ_.jpg
+B00005YH0L,"Classics In The Movies, Vol. 1Classics In The Movies, Vol. 1",3,,
+B0000061MY,SouvenirSouvenir,3,,
+3833901055,Lauras erste Übernachtung,3,4140,http://images.amazon.com/images/P/3833901055.01._SCMZZZZZZZ_.jpg
+B000006MIG,House of OneHouse of One,3,,
+B000000355,Devil's Slide [Musikkassette],3,,http://images.amazon.com/images/P/B000000355.01._SCMZZZZZZZ_.jpg
+B000000EBM,The Life and Times of Country Joe & the Fish [US-Import],3,,http://images.amazon.com/images/P/B000000EBM.01._SCMZZZZZZZ_.jpg
+B0000017B4,21 Hits [UK-Import],3,,http://images.amazon.com/images/P/B0000017B4.01._SCMZZZZZZZ_.jpg
+B0000035SL,Dessau: Einstein (Gesamtaufnahme),3,62182,http://images.amazon.com/images/P/B0000035SL.03._SCMZZZZZZZ_.jpg
+B00008F5FA,What Does It Mean to Love? [Musikkassette]What Does It Mean to Love? [Musikkassette]What Does It Mean to Love? [Musikkassette],3,,
+B00000DZFK,Hymn to Love: Greatest Hits in English,3,,
+B00000ELBM,Pure Schuur [Musikkassette],3,,
+B000005CRA,What Does It Mean to Love?What Does It Mean to Love?What Does It Mean to Love?,3,,
+B00003E443,So Full of Love/Love Fever,3,,http://images.amazon.com/images/P/B00003E443.01._SCMZZZZZZZ_.jpg
+B00004ZD57,Klavierkonzert 2,3,38200,http://images.amazon.com/images/P/B00004ZD57.03._SCMZZZZZZZ_.jpg
+B00000DLX7,Mickey One (Verve Master Edition)Mickey One (Verve Master Edition),3,,http://images.amazon.com/images/P/B00000DLX7.03._SCMZZZZZZZ_.jpghttp://images.amazon.com/images/P/B00000DLX7.03._SCMZZZZZZZ_.jpg
+B00006J9MK,If I Should Fall to the Field,3,26346,http://images.amazon.com/images/P/B00006J9MK.03._SCMZZZZZZZ_.jpg
+B00006JYJJ,I Love Salsa 2,3,20596,http://images.amazon.com/images/P/B00006JYJJ.03._SCMZZZZZZZ_.jpg
+B00009MGGF,Winners,3,,
+B0000A4GEK,Mahoromatic,3,,http://images.amazon.com/images/P/B0000A4GEK.01._SCMZZZZZZZ_.jpg
+B0000508P9,Holiday Inn [US-Import],2,,http://images.amazon.com/images/P/B0000508P9.01._SCMZZZZZZZ_.jpg
+...
+
+#4
+product
+B00004CWTY
+B00005AT2N
+B0007Z0Y72
+
+#5
+140 rows
+prod_number,title,rating,sales_rank,image
+389830695X,Überfliessende Himmel - Rilke Projekt Vol. 3,2.6,519,http://images.amazon.com/images/P/389830695X.03._SCMZZZZZZZ_.jpg
+3800050870,"anders, Bd.2 : Im dunklen Land",4.2,3247,http://images.amazon.com/images/P/3800050870.03._SCMZZZZZZZ_.jpg
+B00009AHNC,On the Rocks,3,2382,http://images.amazon.com/images/P/B00009AHNC.03._SCMZZZZZZZ_.jpg
+B000AGK83S,I Like to Move It,2.6666666666666665,3839,http://images.amazon.com/images/P/B000AGK83S.03._SCMZZZZZZZ_.jpg
+B000AGK9UU,Someday (I Will Understand),4.2,5283,http://images.amazon.com/images/P/B000AGK9UU.03._SCMZZZZZZZ_.jpg
+B0008EI7RQ,Am I My Brother'S Keeper?,3,9463,http://images.amazon.com/images/P/B0008EI7RQ.03._SCMZZZZZZZ_.jpg
+B00009LI6V,"Delpy,Julie",3.8,7216,http://images.amazon.com/images/P/B00009LI6V.03._SCMZZZZZZZ_.jpg
+B0001U1PYO,The Difference Between Me And You Is That I'm Not On Fire,3.4,31422,http://images.amazon.com/images/P/B0001U1PYO.03._SCMZZZZZZZ_.jpg
+B00005S6LX,Enchantment,3.75,25302,http://images.amazon.com/images/P/B00005S6LX.03._SCMZZZZZZZ_.jpg
+B0007SK9OM,Gods and Monsters,3.2,33788,http://images.amazon.com/images/P/B0007SK9OM.03._SCMZZZZZZZ_.jpg
+B00009YNGB,Oops! I Did It Again,3.8,42114,
+B0007QCGT0,I Know,4,35437,http://images.amazon.com/images/P/B0007QCGT0.03._SCMZZZZZZZ_.jpg
+B0007VCV68,I Know (Unplugged Version),3.4,33786,http://images.amazon.com/images/P/B0007VCV68.03._SCMZZZZZZZ_.jpg
+B00006LJ95,But One Day,4.2,35960,http://images.amazon.com/images/P/B00006LJ95.03._SCMZZZZZZZ_.jpg
+3791504657,Tintenherz,2.2,16,http://images.amazon.com/images/P/3791504657.01._SCMZZZZZZZ_.jpg
+3800051680,"Der König von Narnia, Neuübersetzung",3.6666666666666665,41,http://images.amazon.com/images/P/3800051680.03._SCMZZZZZZZ_.jpg
+3800051753,Die Zauberin von Märchenmond,2.8,608,http://images.amazon.com/images/P/3800051753.01._SCMZZZZZZZ_.jpg
+3898303039,"Rilke Projekt, Bis an alle Sterne, 1 Audio-CD",3.6,747,http://images.amazon.com/images/P/3898303039.03._SCMZZZZZZZ_.jpg
+398081890X,"Progressive Muskelentspannung nach Jacobson, 1 Audio-CD",4,1385,http://images.amazon.com/images/P/398081890X.03._SCMZZZZZZZ_.jpg
+3897771136,365 Experimente für jeden Tag,3.5,4353,http://images.amazon.com/images/P/3897771136.03._SCMZZZZZZZ_.jpg
+...
+
+#6
+1,220 rows
+prod_number
+B0000668PG
+B00005YH0L
+B0000061MY
+3833901055
+B000006MIG
+B000000355
+B000000EBM
+B0000017B4
+B0000035SL
+B00008F5FA
+B0000073UH
+B00000DZFK
+B00000ELBM
+B00000I3US
+B000005CRA
+B00003E443
+B00004ZD57
+B00005O41T
+B00002DGW7
+B00000DLX7
+...
