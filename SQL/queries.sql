@@ -34,7 +34,8 @@ SELECT *
 FROM product
 WHERE prod_number
 NOT IN (SELECT product
-    FROM store_inventory);
+    FROM store_inventory
+    WHERE price IS NOT NULL);
 
 -- task 4
 SELECT DISTINCT product
@@ -101,11 +102,11 @@ FROM (
     ) cardinalities;
 
 -- task 10
-WITH RECURSIVE main_category_mapping (sub_category, main_category, level) AS
-                   (SELECT sub_category, super_category, 1
+WITH RECURSIVE main_category_mapping (sub_category, main_category) AS
+                   (SELECT sub_category, super_category
                     FROM category_hierarchy
                     UNION
-                    SELECT mapping.sub_category, hierarchy.super_category, mapping.level + 1
+                    SELECT mapping.sub_category, hierarchy.super_category
                     FROM main_category_mapping AS mapping, category_hierarchy AS hierarchy
                     WHERE mapping.main_category = hierarchy.sub_category)
 SELECT DISTINCT pc1.product
