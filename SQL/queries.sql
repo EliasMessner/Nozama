@@ -75,7 +75,7 @@ WHERE NOT EXISTS
 -- task 7
 SELECT *
 FROM customer c
-WHERE 10 = (
+WHERE 10 <= (
     SELECT COUNT(*)
     FROM review
     WHERE customer = c.username
