@@ -73,7 +73,7 @@ WHERE NOT EXISTS
     WHERE review.product = product.prod_number);
 
 -- task 7
-SELECT *
+SELECT username
 FROM customer c
 WHERE 10 <= (
     SELECT COUNT(*)
@@ -153,10 +153,11 @@ WITH
                             FROM store_inventory si
                             WHERE si.product = leipzig_and_dresden.prod_number
                             AND si.store_name = 'Leipzig')
-                            <
+                            <=
                             (SELECT MIN(price)
                             FROM store_inventory si
                             WHERE si.product = leipzig_and_dresden.prod_number
                             AND si.store_name = 'Dresden')))
-SELECT CAST(leipzig_cheapest.leipzig_cheapest_count AS float) / leipzig_and_dresden_count.product_count
+SELECT  100 * CAST(leipzig_cheapest.leipzig_cheapest_count AS float) / leipzig_and_dresden_count.product_count AS
+    percentage
 FROM leipzig_cheapest, leipzig_and_dresden_count;
