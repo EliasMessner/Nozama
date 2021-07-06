@@ -101,3 +101,93 @@ B00005O41T
 B00002DGW7
 B00000DLX7
 ...
+
+#7
+username
+m_oehri_stadtmagazine
+petethemusicfan
+media-maniade
+katja-lesemaus
+vspillner
+marccoll11
+
+#8
+name
+Ac
+Al
+Alexandre
+Daniel Defoe
+Dav
+Dietmar Mues
+Heino
+Johann Sebastian Bach
+Jrgen
+Jürgen
+Korn
+Leonard Bernstein
+Nas
+Nicole
+Peter
+Robin
+Sabrina
+Sandra
+Va
+Wolfgang Amadeus Mozart
+
+#9
+avg
+21.6059190031152648
+
+#10
+88 rows
+product
+B000007OTH
+B00004SA8A
+B000069CVK
+B000ASAEPI
+B00003JA0U
+3551354014
+3407784570
+B0000AKGV9
+B0000E39MD
+B00005U8E6
+B0007QS1YO
+B0009HLB3O
+B000003ZVH
+B000063WRR
+3833900903
+B000BGHBJG
+B000B5IOSE
+B0001JZOKQ
+B0000ULZQ8
+B0000041DG
+...
+
+#11
+117 rows
+prod_number,title,rating,sales_rank,image
+B00002DGW7,Movie Classics,3,3069,http://images.amazon.com/images/P/B00002DGW7.03._SCMZZZZZZZ_.gif
+B00005UW50,Baroque Esprit - Il Pastor Fido,4,11121,http://images.amazon.com/images/P/B00005UW50.03._SCMZZZZZZZ_.jpg
+B00069KW58,Dream on,4.8,661,http://images.amazon.com/images/P/B00069KW58.03._SCMZZZZZZZ_.jpg
+B000ANPWYG,I'Ve Got My Own Hell to Raise,5,1171,http://images.amazon.com/images/P/B000ANPWYG.01._SCMZZZZZZZ_.jpg
+B0002TB60W,"Various Artists - Karaoke: Love Songs, Vol. 01",4,1586,http://images.amazon.com/images/P/B0002TB60W.03._SCMZZZZZZZ_.jpg
+B000005GWE,I Can See Your House from Here,4.333333333333333,5029,http://images.amazon.com/images/P/B000005GWE.03._SCMZZZZZZZ_.jpg
+B000BAVWA6,We Are Always Searching,3,12724,http://images.amazon.com/images/P/B000BAVWA6.03._SCMZZZZZZZ_.jpg
+B000BFHW1E,Melissa (25th Anniversary Re-I,3,16150,http://ec1.images-amazon.com/images/P/B000BFHW1E.03._SCMZZZZZZZ_.jpg
+B00004W55E,Individuality (Can I Be Me? ),4.666666666666667,15297,http://ec1.images-amazon.com/images/P/B00004W55E.03._SCMZZZZZZZ_.jpg
+B0002PZWQ0,Hed Kandi Summer 2004,5,17506,http://images.amazon.com/images/P/B0002PZWQ0.03._SCMZZZZZZZ_.jpg
+B0009WPCJS,I Want a Girlfriend,5,14462,http://images.amazon.com/images/P/B0009WPCJS.03._SCMZZZZZZZ_.jpg
+B000BW9BKC,Tokyo Project/Introduction,3,14363,http://images.amazon.com/images/P/B000BW9BKC.03._SCMZZZZZZZ_.jpg
+B000B2WK8M,Once+Wish I Had An Angel (Collectors Box),3,17371,http://images.amazon.com/images/P/B000B2WK8M.03._SCMZZZZZZZ_.jpg
+B000BFHW1O,Abigail (25th Anniversary Re-I,3,14464,http://images.amazon.com/images/P/B000BFHW1O.03._SCMZZZZZZZ_.jpg
+B0002WS3M8,Facts of Life/I Don'T Know Wha,3,24148,http://images.amazon.com/images/P/B0002WS3M8.03._SCMZZZZZZZ_.jpg
+B00007B6WD,Night of the Proms 2002-d,4.5,20801,http://images.amazon.com/images/P/B00007B6WD.03._SCMZZZZZZZ_.jpg
+B000B6VUAW,Trilogy-Tonight I'M Yours/Atla,3,26629,http://images.amazon.com/images/P/B000B6VUAW.03._SCMZZZZZZZ_.jpg
+B0002Z9ZCW,Pure Smooth Jazz,3,28451,http://images.amazon.com/images/P/B0002Z9ZCW.03._SCMZZZZZZZ_.jpg
+B0007WRTAA,Apres l'Amour,5,20860,http://images.amazon.com/images/P/B0007WRTAA.01._SCMZZZZZZZ_.jpg
+B0009SQ6YW,I Love Everybody,3,51492,http://images.amazon.com/images/P/B0009SQ6YW.01._SCMZZZZZZZ_.jpg
+...
+
+#12
+percentage
+64.95726495726495
