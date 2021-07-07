@@ -411,8 +411,12 @@ public abstract class ProductHandler extends DefaultHandler {
             String[] labels = (String[]) resultSet.getArray("labels").getArray();
             musicCd.setLabels(Arrays.asList(labels));
             musicCd.setPublicationDate(resultSet.getDate("publication_date") != null ? resultSet.getDate("publication_date").toLocalDate() : null);
-            String[] titles = (String[]) resultSet.getArray("titles").getArray();
-            musicCd.setTitles(Arrays.asList(titles));
+            if (resultSet.getArray("titles") != null) {
+                String[] titles = (String[]) resultSet.getArray("titles").getArray();
+                musicCd.setTitles(Arrays.asList(titles));
+            } else {
+                musicCd.setTitles(null);
+            }
             obtainPersonRelations(musicCd);
             return musicCd;
         }
