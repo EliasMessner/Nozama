@@ -45,7 +45,7 @@ public class MusicCd extends Product {
         return super.equals(other)
                 && alphanumericallyEqualsIgnoreOrder(labels, other.getLabels())
                 && equalsAllowNull(publicationDate, other.getPublicationDate())
-                && alphanumericallyEqualsIgnoreOrder(titles, other.getTitles())
+                && titles == null || other.getTitles() == null || alphanumericallyEqualsIgnoreOrder(titles, other.getTitles())
                 && artists.containsAll(other.getArtists()) && other.getArtists().containsAll(artists);
     }
 

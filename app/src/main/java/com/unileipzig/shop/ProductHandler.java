@@ -440,10 +440,10 @@ public abstract class ProductHandler extends DefaultHandler {
         } else {
             pStmt.setNull(3, Types.DATE);
         }
-        if (((MusicCd) product).getTitles().isEmpty()) {
-            pStmt.setNull(4, Types.ARRAY);
-        } else {
+        if (!((MusicCd) product).getTitles().isEmpty()) {
             pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+        } else {
+            pStmt.setNull(4, Types.ARRAY);
         }
         pStmt.executeUpdate();
     }
