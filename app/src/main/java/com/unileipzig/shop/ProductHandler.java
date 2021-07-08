@@ -21,7 +21,8 @@ public abstract class ProductHandler extends DefaultHandler {
 
     protected StringBuilder currentValue = new StringBuilder();
     protected Product product;
-    protected Offer offer;
+    protected Offer currentOffer;
+    protected List<Offer> offers = new ArrayList<>();
     protected boolean tracks = false;
     protected boolean similars = false;
     protected PrintWriter printWriter;
@@ -87,8 +88,10 @@ public abstract class ProductHandler extends DefaultHandler {
                 similars = true;
                 break;
             case "price":
+                currentOffer = new Offer(product, shop);
+                offers.add(currentOffer);
                 if (this.attributeValueIsSpecified(attributes.getValue("state"))) {
-                    offer.setArticleCondition(attributes.getValue("state"));
+                    currentOffer.setArticleCondition(attributes.getValue("state"));
                 }
                 break;
         }
@@ -112,7 +115,7 @@ public abstract class ProductHandler extends DefaultHandler {
                     similars = false;
                     break;
                 case "price":
-                    offer.setPrice(parsePrice());
+                    currentOffer.setPrice(parsePrice());
             }
         } catch (SQLException e) {
             printWriter.println(e.getMessage());
@@ -166,7 +169,6 @@ public abstract class ProductHandler extends DefaultHandler {
         if (attributeValueIsSpecified(attributes.getValue("salesrank"))) {
             product.setSalesRank(Integer.parseInt(attributes.getValue("salesrank")));
         }
-        offer = new Offer(product, shop);
     }
 
     /**
@@ -180,7 +182,7 @@ public abstract class ProductHandler extends DefaultHandler {
             this.persistProduct();
             this.persistPersonAndRelations();
             conn.commit(); // commit here already because if only persistOffer fails we still want to keep the product
-            this.persistOffer();
+            this.persistOffers();
             conn.commit();
         } catch (SQLException throwables) {
             conn.rollback();
@@ -189,6 +191,8 @@ public abstract class ProductHandler extends DefaultHandler {
         } finally {
             conn.setAutoCommit(true);
         }
+        offers = new ArrayList<>();
+        currentOffer = null;
     }
 
     protected void readProductAttributes(String qName, Attributes attributes) {
@@ -301,7 +305,13 @@ public abstract class ProductHandler extends DefaultHandler {
         }
     }
 
-    private void persistOffer() throws SQLException {
+    private void persistOffers() throws SQLException {
+        for (Offer offer : offers) {
+            persistOffer(offer);
+        }
+    }
+
+    private void persistOffer(Offer offer) throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store_inventory (product, " +
                 "store_name, store_street, store_zip, article_condition, price) VALUES (?, ?, ?, ?, ?, ?)");
         pStmt.setString(1, offer.getProduct().getProdNumber());
@@ -401,8 +411,12 @@ public abstract class ProductHandler extends DefaultHandler {
             String[] labels = (String[]) resultSet.getArray("labels").getArray();
             musicCd.setLabels(Arrays.asList(labels));
             musicCd.setPublicationDate(resultSet.getDate("publication_date") != null ? resultSet.getDate("publication_date").toLocalDate() : null);
-            String[] titles = (String[]) resultSet.getArray("titles").getArray();
-            musicCd.setTitles(Arrays.asList(titles));
+            if (resultSet.getArray("titles") != null) {
+                String[] titles = (String[]) resultSet.getArray("titles").getArray();
+                musicCd.setTitles(Arrays.asList(titles));
+            } else {
+                musicCd.setTitles(null);
+            }
             obtainPersonRelations(musicCd);
             return musicCd;
         }
@@ -430,7 +444,11 @@ public abstract class ProductHandler extends DefaultHandler {
         } else {
             pStmt.setNull(3, Types.DATE);
         }
-        pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+        if (!((MusicCd) product).getTitles().isEmpty()) {
+            pStmt.setArray(4, conn.createArrayOf("VARCHAR", ((MusicCd) product).getTitles().toArray()));
+        } else {
+            pStmt.setNull(4, Types.ARRAY);
+        }
         pStmt.executeUpdate();
     }
 

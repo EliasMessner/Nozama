@@ -3,6 +3,8 @@ CREATE TABLE person(
     name VARCHAR NOT NULL
 );
 
+CREATE INDEX ON person (name);
+
 CREATE TABLE product(
     prod_number VARCHAR PRIMARY KEY,
     title VARCHAR NOT NULL,
@@ -11,11 +13,13 @@ CREATE TABLE product(
     image VARCHAR
 );
 
+CREATE INDEX ON product (title);
+
 CREATE TABLE book(
     prod_number VARCHAR PRIMARY KEY REFERENCES product(prod_number),
     page_number INT CHECK(page_number IS NULL OR page_number > 0),
     publication_date DATE,
-    isbn VARCHAR UNIQUE,
+    isbn VARCHAR UNIQUE CHECK(length(isbn) = 10 OR length(isbn) = 13),
     publishers VARCHAR ARRAY
 );
 
@@ -57,6 +61,8 @@ CREATE TABLE category(
     name VARCHAR NOT NULL
 );
 
+CREATE INDEX ON category (name);
+
 CREATE TABLE category_hierarchy(
     super_category INT REFERENCES category(id),
     sub_category INT REFERENCES category(id),
@@ -68,3 +74,19 @@ CREATE TABLE product_category(
     category INT REFERENCES category(id),
     PRIMARY KEY(product,category)
 );
+
+CREATE OR REPLACE FUNCTION check_one_artist() RETURNS TRIGGER AS $BODY$
+DECLARE
+selected_cd music_cd%rowtype;
+BEGIN
+SELECT cd INTO selected_cd FROM cd_artist WHERE cd = NEW.prod_number LIMIT 1;
+IF NOT FOUND THEN RAISE EXCEPTION 'At least one artist required for cd %', NEW.prod_number; END IF;
+RETURN NULL;
+END;
+$BODY$ LANGUAGE plpgsql;
+
+CREATE CONSTRAINT TRIGGER one_artist
+    AFTER INSERT ON music_cd
+    INITIALLY DEFERRED
+    FOR EACH ROW
+    EXECUTE FUNCTION check_one_artist();
