@@ -288,8 +288,8 @@ public abstract class ProductHandler extends DefaultHandler {
 
     private void persistProduct() throws SQLException {
         if (!productExists()) {
-            PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, rating, " +
-                    "sales_rank, image) VALUES (?, ?, 3, ?, ?)");
+            PreparedStatement pStmt0 = conn.prepareStatement("INSERT INTO product (prod_number, title, " +
+                    "sales_rank, image) VALUES (?, ?, ?, ?)");
             pStmt0.setString(1, product.getProdNumber());
             pStmt0.setString(2, product.getTitle());
             pStmt0.setObject(3, product.getSalesRank(), Types.INTEGER);

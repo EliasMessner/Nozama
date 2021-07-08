@@ -39,7 +39,7 @@ CREATE TABLE sale(
 CREATE TABLE review(
     id SERIAL PRIMARY KEY,
 	customer VARCHAR REFERENCES customer(username),
-    product VARCHAR REFERENCES product(prod_number),
+    product VARCHAR NOT NULL REFERENCES product(prod_number),
     date DATE CHECK(date <= CURRENT_DATE),
 	stars INT NOT NULL,
 	summary VARCHAR,
