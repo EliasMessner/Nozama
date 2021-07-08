@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import java.util.ArrayList;
 

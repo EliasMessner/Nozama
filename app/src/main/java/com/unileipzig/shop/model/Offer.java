@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import java.math.BigDecimal;
 
@@ -13,7 +13,7 @@ public class Offer {
     private String articleCondition;
     private BigDecimal price;
 
-    Offer(Product product, Shop shop) {
+    public Offer(Product product, Shop shop) {
         this.product = product;
         this.shop = shop;
     }

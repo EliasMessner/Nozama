@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 /**
  * Model for table customer.
@@ -16,7 +16,7 @@ public class Customer {
      * Constructs a customer with a specified username.
      * @param username the username of the customer.
      */
-    Customer(String username) {
+    public Customer(String username) {
         this.username = username;
     }
 

@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import java.time.LocalDate;
 
@@ -14,7 +14,7 @@ public class Review {
     private String summary;
     private String details;
 
-    Review (Customer customer, Product product, Integer stars){
+    public Review (Customer customer, Product product, Integer stars){
         this.customer = customer;
         this.product = product;
         this.stars = stars;

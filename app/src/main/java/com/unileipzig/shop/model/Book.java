@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class Book extends Product {
      * @param prodNumber The product number of this book.
      * @param title The title of this book.
      */
-    Book(String prodNumber, String title) {
+    public Book(String prodNumber, String title) {
         super(prodNumber, title);
         publishers = new ArrayList<>();
         authors = new ArrayList<>();

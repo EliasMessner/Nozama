@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ public class Dvd extends Product {
      * @param prodNumber
      * @param title
      */
-    Dvd(String prodNumber, String title) {
+    public Dvd(String prodNumber, String title) {
         super(prodNumber, title);
         actors = new ArrayList<>();
         creators = new ArrayList<>();

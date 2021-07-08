@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import static com.unileipzig.shop.CompareUtil.alphanumericallyEquals;
 import static com.unileipzig.shop.CompareUtil.equalsAllowNull;
@@ -19,7 +19,7 @@ public class Product {
      * @param prodNumber the product number for identification, serving as the key in the database and asin in th xml files.
      * @param title the title of the product
      */
-    Product(String prodNumber, String title) {
+    public Product(String prodNumber, String title) {
         this.prodNumber = prodNumber;
         this.title = title;
         this.rating = 3.0;

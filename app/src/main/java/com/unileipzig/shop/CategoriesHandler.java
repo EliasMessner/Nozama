@@ -1,5 +1,6 @@
 package com.unileipzig.shop;
 
+import com.unileipzig.shop.model.Category;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;

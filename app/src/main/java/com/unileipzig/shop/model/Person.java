@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import static com.unileipzig.shop.CompareUtil.alphanumericallyEquals;
 
@@ -10,12 +10,12 @@ public class Person {
     private int id;
     private String name;
 
-    Person(int id, String name) {
+    public Person(int id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    Person(String name) {
+    public Person(String name) {
         this.name = name;
     }
 
