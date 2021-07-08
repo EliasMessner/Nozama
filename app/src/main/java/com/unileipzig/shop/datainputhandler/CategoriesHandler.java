@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.datainputhandler;
 
 import com.unileipzig.shop.model.Category;
 import org.xml.sax.Attributes;

@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.datainputhandler;
 
 import com.opencsv.CSVReader;
 import com.opencsv.CSVReaderBuilder;
@@ -17,7 +17,7 @@ public class ReviewHandler {
     private Connection conn;
     private PrintWriter printWriter;
 
-    ReviewHandler(String inputPath, Connection conn, String errorPath) throws IOException {
+    public ReviewHandler(String inputPath, Connection conn, String errorPath) throws IOException {
         this.inputPath = inputPath;
         this.conn = conn;
         this.printWriter = new PrintWriter(new FileWriter(errorPath));
