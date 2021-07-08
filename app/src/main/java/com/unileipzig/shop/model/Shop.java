@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 /**
  * model for class store
@@ -9,7 +9,7 @@ public class Shop {
     private String street;
     private String zip;
 
-    Shop(String name, String street, String zip) {
+    public Shop(String name, String street, String zip) {
         this.name = name;
         this.street = street;
         this.zip = zip;

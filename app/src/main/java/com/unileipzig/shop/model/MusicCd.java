@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.model;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class MusicCd extends Product {
      * @param prodNumber the product number of this music cd.
      * @param title the title of this music cd.
      */
-    MusicCd(String prodNumber, String title) {
+    public MusicCd(String prodNumber, String title) {
         super(prodNumber, title);
         labels = new ArrayList<>();
         titles = new ArrayList<>();

@@ -1,5 +1,9 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.datainputhandler;
 
+import com.unileipzig.shop.model.Book;
+import com.unileipzig.shop.model.Dvd;
+import com.unileipzig.shop.model.MusicCd;
+import com.unileipzig.shop.model.Person;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
