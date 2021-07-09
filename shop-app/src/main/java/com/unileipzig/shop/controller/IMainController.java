@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IMainController {
 
-    public void init();
+    public void init() throws ClassNotFoundException;
 
     public void finish();
 

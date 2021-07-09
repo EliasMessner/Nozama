@@ -11,7 +11,7 @@ import java.util.List;
 public class MainController implements IMainController {
 
     @Override
-    public void init() {
+    public void init() throws ClassNotFoundException {
         HibernateConnector.initSessionFactory();
     }
 

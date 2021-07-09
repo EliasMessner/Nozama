@@ -1,21 +1,27 @@
 package com.unileipzig.shop.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+
+import javax.persistence.*;
 
 @Entity
-@Table( name = "product")
+@DynamicInsert
+@DynamicUpdate
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Product {
 
     @Id
-    @Column(name = "prod_number")
     private String prodNumber;
+
     private String title;
-    private double rating;
-    @Column(name = "sales_rank")
+
+    @ColumnDefault("3")
+    private Double rating;
+
     private Integer salesRank;
+
     private String image;
 
     /**
