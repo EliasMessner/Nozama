@@ -1,0 +1,28 @@
+version: "3.3"
+services:
+    db:
+        image: postgres
+        environment:
+            POSTGRES_PASSWORD: example
+        networks:
+            - bridge_network
+
+    adminer:
+        image: adminer
+        ports:
+            - 8080:8080
+        networks:
+            - bridge_network
+
+    shop-app:
+        build:
+            context: ..
+            dockerfile: Docker/shop.debug.Dockerfile
+        networks:
+            - bridge_network
+        depends_on:
+            - db
+
+networks:
+    bridge_network:
+        driver: bridge
