@@ -557,15 +557,15 @@ public abstract class ProductHandler extends DefaultHandler {
                 col = "author";
                 break;
             case "actor":
-                pStmt = conn.prepareStatement("SELECT person FROM dvd_actor WHERE dvd = ?");
+                pStmt = conn.prepareStatement("SELECT actor FROM dvd_actor WHERE dvd = ?");
                 col = "actor";
                 break;
             case "creator":
-                pStmt = conn.prepareStatement("SELECT person FROM dvd_creator WHERE dvd = ?");
+                pStmt = conn.prepareStatement("SELECT creator FROM dvd_creator WHERE dvd = ?");
                 col = "creator";
                 break;
             case "director":
-                pStmt = conn.prepareStatement("SELECT person FROM dvd_director WHERE dvd = ?");
+                pStmt = conn.prepareStatement("SELECT director FROM dvd_director WHERE dvd = ?");
                 col = "director";
                 break;
             default:
