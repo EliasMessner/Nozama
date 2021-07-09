@@ -13,24 +13,6 @@
 
   <session-factory>
 
-    <!-- Database connection settings -->
-    <property name="connection.driver_class">org.postgresql.Driver</property>
-    <property name="connection.url">jdbc:postgresql://db:5432/test_1</property>
-    <property name="connection.username">postgres</property>
-    <property name="connection.password">example</property>
-
-    <!-- JDBC connection pool (use the built-in) -->
-    <property name="connection.pool_size">1</property>
-
-    <!-- SQL dialect -->
-    <property name="dialect">org.hibernate.dialect.PostgreSQL9Dialect</property>
-
-    <!-- Disable the second-level cache  -->
-    <property name="cache.provider_class">org.hibernate.cache.internal.NoCacheProvider</property>
-
-    <!-- Echo all executed SQL to stdout -->
-    <property name="show_sql">true</property>
-
     <mapping class="com.unileipzig.shop.model.Product"/>
 
   </session-factory>
