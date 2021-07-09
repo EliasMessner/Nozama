@@ -43,11 +43,22 @@ CREATE TABLE book_author(
     PRIMARY KEY(book, author)
 );
 
-CREATE TABLE dvd_person(
+CREATE TABLE dvd_actor(
     dvd VARCHAR REFERENCES dvd(prod_number),
-    person INT REFERENCES person(id),
-    role VARCHAR,
-    PRIMARY KEY(dvd, person, role)
+    actor INT REFERENCES person(id),
+    PRIMARY KEY(dvd, actor)
+);
+
+CREATE TABLE dvd_creator(
+    dvd VARCHAR REFERENCES dvd(prod_number),
+    creator INT REFERENCES person(id),
+    PRIMARY KEY(dvd, creator)
+);
+
+CREATE TABLE dvd_director(
+    dvd VARCHAR REFERENCES dvd(prod_number),
+    director INT REFERENCES person(id),
+    PRIMARY KEY(dvd, director)
 );
 
 CREATE TABLE cd_artist(
