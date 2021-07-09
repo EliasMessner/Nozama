@@ -1,18 +1,27 @@
 package com.unileipzig.shop.model;
 
-import static com.unileipzig.shop.CompareUtil.alphanumericallyEquals;
-import static com.unileipzig.shop.CompareUtil.equalsAllowNull;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
-/**
- * model for table product
- */
+@Entity
+@Table( name = "product")
 public class Product {
 
+    @Id
+    @Column(name = "prod_number")
     private String prodNumber;
     private String title;
     private double rating;
+    @Column(name = "sales_rank")
     private Integer salesRank;
     private String image;
+
+    /**
+     * Constructor for Hibernate
+     */
+    public Product(){};
 
     /**
      * Constructs a product with initial rating of 3.0, specified title and product number.
@@ -24,29 +33,12 @@ public class Product {
         this.title = title;
     }
 
-    /**.
-     * @param o the Object to compare this product to
-     * @return true if the titles of both are equal with regard to only alphanumerical characters, and null values for
-     * optional attribute image don't violate equality
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Product)) {
-            return super.equals(o);
-        }
-        Product other = (Product) o;
-        return this.prodNumber.equals(other.getProdNumber())
-                && alphanumericallyEquals(title, other.getTitle())
-                && rating == other.getRating()
-                && equalsAllowNull(image, other.getImage())  // because img can be null
-                && equalsAllowNull(salesRank, other.getSalesRank());
-                // ignore all special characters and whitespaces when comparing titles because they might be formatted
-                // incorrectly. When prodNumber matches and title matches except for special characters, we can assume
-                // they are the same product
-    }
-
     public String getProdNumber() {
         return prodNumber;
+    }
+
+    public void setProdNumber(String prodNumber) {
+        this.prodNumber = prodNumber;
     }
 
     public String getTitle() {
