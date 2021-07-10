@@ -276,7 +276,7 @@ public abstract class ProductHandler extends DefaultHandler {
     private void persistShop(){
         try {
             PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store (s_name, street, zip) VALUES (?, ?, ?) " +
-                    "ON CONFLICT (s_name, street, zip) DO NOTHING");
+                    "ON CONFLICT (s_name) DO NOTHING");
             pStmt.setString(1, shop.getName());
             pStmt.setString(2, shop.getStreet());
             pStmt.setString(3, shop.getZip());
@@ -314,13 +314,11 @@ public abstract class ProductHandler extends DefaultHandler {
 
     private void persistOffer(Offer offer) throws SQLException {
         PreparedStatement pStmt = conn.prepareStatement("INSERT INTO store_inventory (product, " +
-                "store_name, store_street, store_zip, article_condition, price) VALUES (?, ?, ?, ?, ?, ?)");
+                "store_name, article_condition, price) VALUES (?, ?, ?, ?)");
         pStmt.setString(1, offer.getProduct().getProdNumber());
         pStmt.setString(2, offer.getShop().getName());
-        pStmt.setString(3, offer.getShop().getStreet());
-        pStmt.setString(4, offer.getShop().getZip());
-        pStmt.setString(5, offer.getArticleCondition());
-        pStmt.setBigDecimal(6, offer.getPrice());
+        pStmt.setString(3, offer.getArticleCondition());
+        pStmt.setBigDecimal(4, offer.getPrice());
         pStmt.executeUpdate();
     }
 
