@@ -1,5 +1,6 @@
 package com.unileipzig.shop.controller;
 
+import com.unileipzig.shop.InputException;
 import com.unileipzig.shop.model.Customer;
 import com.unileipzig.shop.model.Offer;
 import com.unileipzig.shop.model.Product;
@@ -15,7 +16,7 @@ public interface IMainController {
 
     public Product getProduct(String prodNumber);
 
-    public List<Product> getProducts(String pattern);
+    public List<Product> getProducts(String titlePattern);
 
     public String getCategoryTree();
 
@@ -23,7 +24,7 @@ public interface IMainController {
 
     public List<Product> getTopProducts(int number);
 
-    public List<Product> getSimilarCheaperProduct(String prodNumber);
+    public List<Product> getSimilarCheaperProducts(String prodNumber) throws InputException;
 
     public void addNewReview(String customer, String product, String rating, int stars, String summary, String details);
 
