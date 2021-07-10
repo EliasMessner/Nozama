@@ -1,10 +1,13 @@
 package com.unileipzig.shop.model;
 
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @DynamicInsert
@@ -24,6 +27,12 @@ public class Product {
 
     private String image;
 
+    @ManyToMany()
+    @Cascade( { org.hibernate.annotations.CascadeType.SAVE_UPDATE })
+    @JoinTable(name = "similar_products", joinColumns = @JoinColumn(name = "product1"), inverseJoinColumns =
+    @JoinColumn(name = "product2"))
+    private List<Product> similarProducts;
+
     /**
      * Constructor for Hibernate
      */
@@ -37,6 +46,13 @@ public class Product {
     public Product(String prodNumber, String title) {
         this.prodNumber = prodNumber;
         this.title = title;
+
+        this.similarProducts = new ArrayList<>();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj) || this.prodNumber.equals(((Product) obj).prodNumber);
     }
 
     public String getProdNumber() {
@@ -55,11 +71,11 @@ public class Product {
         this.title = title;
     }
 
-    public double getRating() {
+    public Double getRating() {
         return rating;
     }
 
-    public void setRating(double rating) {
+    public void setRating(Double rating) {
         this.rating = rating;
     }
 
@@ -77,5 +93,17 @@ public class Product {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public List<Product> getSimilarProducts() {
+        return similarProducts;
+    }
+
+    public void setSimilarProducts(List<Product> similarProducts) {
+        this.similarProducts = similarProducts;
+    }
+
+    public void addSimilarProduct(Product similarProduct) {
+        this.similarProducts.add(similarProduct);
     }
 }
