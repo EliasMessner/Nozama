@@ -11,8 +11,10 @@ public class Store {
     @Column(name = "s_name")
     private String name;
 
+    @Column(nullable = false)
     private String street;
 
+    @Column(nullable = false)
     private String zip;
 
     public Store(){};

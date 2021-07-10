@@ -18,6 +18,7 @@ public class Product {
     @Id
     private String prodNumber;
 
+    @Column(nullable = false)
     private String title;
 
     @ColumnDefault("3")

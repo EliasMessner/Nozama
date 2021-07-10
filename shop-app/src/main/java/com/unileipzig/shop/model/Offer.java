@@ -12,13 +12,14 @@ public class Offer {
     private int id;
 
     @ManyToOne
-    @JoinColumn(name = "product")
+    @JoinColumn(name = "product", nullable = false)
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "store_name")
+    @JoinColumn(name = "store_name", nullable = false)
     private Store store;
 
+    @Column(nullable = false)
     private String articleCondition;
 
     private BigDecimal price;
