@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  */
 public class Offer {
 
-    private int artId;
+    private int id;
     private Product product;
     private Shop shop;
     private String articleCondition;
@@ -18,12 +18,12 @@ public class Offer {
         this.shop = shop;
     }
 
-    public int getArtId() {
-        return artId;
+    public int getId() {
+        return id;
     }
 
-    public void setArtId(int artId) {
-        this.artId = artId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public Product getProduct() {

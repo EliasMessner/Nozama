@@ -22,6 +22,7 @@ public class Book extends Product {
 
     private LocalDate publicationDate;
 
+    @Column(unique = true)
     private String isbn;
 
     @Type(type = "list-array")

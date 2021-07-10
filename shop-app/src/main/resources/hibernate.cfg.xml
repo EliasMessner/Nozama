@@ -18,6 +18,8 @@
     <mapping class="com.unileipzig.shop.model.Dvd"/>
     <mapping class="com.unileipzig.shop.model.MusicCd"/>
     <mapping class="com.unileipzig.shop.model.Person"/>
+    <mapping class="com.unileipzig.shop.model.Store"/>
+    <mapping class="com.unileipzig.shop.model.Offer"/>
 
   </session-factory>
 
