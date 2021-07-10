@@ -512,19 +512,16 @@ public abstract class ProductHandler extends DefaultHandler {
                         "VALUES (?, ?) ON CONFLICT (book, author) DO UPDATE SET book = ?, author = ?");
                 break;
             case "actor":
-                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'actor') ON CONFLICT (dvd, person, role) DO UPDATE SET dvd = ?, " +
-                        "person = ?, role = 'actor'");
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_actor (dvd, actor) " +
+                        "VALUES (?, ?) ON CONFLICT (dvd, actor) DO UPDATE SET dvd = ?, actor = ?");
                 break;
             case "creator":
-                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'creator') ON CONFLICT (dvd, person, role) DO UPDATE SET dvd = ?, person = ?, " +
-                        "role = 'creator'");
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_creator (dvd, creator) " +
+                        "VALUES (?, ?) ON CONFLICT (dvd, creator) DO UPDATE SET dvd = ?, creator = ?");
                 break;
             case "director":
-                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_person (dvd, person, role) " +
-                        "VALUES (?, ?, 'director') ON CONFLICT (dvd, person, role) DO UPDATE SET dvd = ?, person = ?, " +
-                        "role = 'director'");
+                pStmtRelation = conn.prepareStatement("INSERT INTO dvd_director (dvd, director) " +
+                        "VALUES (?, ?) ON CONFLICT (dvd, director) DO UPDATE SET dvd = ?, director = ?");
                 break;
             default:
                 conn.rollback();
@@ -560,19 +557,16 @@ public abstract class ProductHandler extends DefaultHandler {
                 col = "author";
                 break;
             case "actor":
-                pStmt = conn.prepareStatement("SELECT person FROM dvd_person WHERE dvd = ? " +
-                        "AND role = 'actor'");
-                col = "person";
+                pStmt = conn.prepareStatement("SELECT actor FROM dvd_actor WHERE dvd = ?");
+                col = "actor";
                 break;
             case "creator":
-                pStmt = conn.prepareStatement("SELECT person FROM dvd_person WHERE dvd = ? " +
-                        "AND role = 'creator'");
-                col = "person";
+                pStmt = conn.prepareStatement("SELECT creator FROM dvd_creator WHERE dvd = ?");
+                col = "creator";
                 break;
             case "director":
-                pStmt = conn.prepareStatement("SELECT person FROM dvd_person WHERE dvd = ? " +
-                        "AND role = 'director'");
-                col = "person";
+                pStmt = conn.prepareStatement("SELECT director FROM dvd_director WHERE dvd = ?");
+                col = "director";
                 break;
             default:
                 conn.rollback();

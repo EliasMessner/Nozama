@@ -1,0 +1,11 @@
+version: "3.3"
+
+services:
+    shop-app:
+        build:
+            context: ..
+            dockerfile: Docker/shop.Dockerfile
+        networks:
+            - bridge_network
+        depends_on:
+            - db

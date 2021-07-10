@@ -22,7 +22,7 @@ public class Product {
     public Product(String prodNumber, String title) {
         this.prodNumber = prodNumber;
         this.title = title;
-        this.rating = 3.0;
+        this.rating = 3;
     }
 
     /**.
