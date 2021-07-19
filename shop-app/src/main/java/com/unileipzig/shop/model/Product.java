@@ -16,6 +16,7 @@ import java.util.List;
 public class Product {
 
     @Id
+    @Column(name = "prod_number")
     private String prodNumber;
 
     @Column(nullable = false)

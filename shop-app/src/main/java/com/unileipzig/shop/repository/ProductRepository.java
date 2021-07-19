@@ -79,4 +79,12 @@ public class ProductRepository {
             return queryCheaper.list();
         }
     }
+
+    public List<Product> getProductsByCategoryId(int catID) {
+        Session session = HibernateConnector.getSession();
+        Query<Product> query = session.createQuery("SELECT p FROM Category c INNER JOIN c.products p " +
+                "WHERE c.id = :catID", Product.class);
+        query.setParameter("catID", catID);
+        return query.list();
+    }
 }

@@ -2,13 +2,11 @@ package com.unileipzig.shop.controller;
 
 import com.unileipzig.shop.HibernateConnector;
 import com.unileipzig.shop.InputException;
-import com.unileipzig.shop.model.Customer;
-import com.unileipzig.shop.model.Offer;
-import com.unileipzig.shop.model.Product;
-import com.unileipzig.shop.model.Review;
-import com.unileipzig.shop.repository.OfferRepository;
-import com.unileipzig.shop.repository.ProductRepository;
+import com.unileipzig.shop.model.*;
+import com.unileipzig.shop.repository.*;
+import org.hibernate.Session;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,13 +36,30 @@ public class MainController implements IMainController {
     }
 
     @Override
-    public String getCategoryTree() {
-        return null;
+    public Category getCategoryTree() {
+        CategoryRepository categoryRepository = new CategoryRepository();
+        Category all = new Category("all");
+        for (Category mainCategory : categoryRepository.getMainCategories()) {
+            all.addChild(mainCategory);
+        }
+        return all;
     }
 
     @Override
     public List<Product> getProductsByCategoryPath(String categoryPath) {
-        return null;
+        String[] path = categoryPath.split("/");
+        Category category = new CategoryRepository().getMainCategories().stream()
+                .filter(category1 -> category1.getName().equals(path[0]))
+                .collect(Collectors.toList())
+                .get(0);
+        for (int i = 1; i < path.length; i++) {
+            int finalI = i;
+            category = category.getChildren().stream()
+                    .filter(category2 -> category2.getName().equals(path[finalI]))
+                    .collect(Collectors.toList())
+                    .get(0);
+        }
+        return new ProductRepository().getProductsByCategoryId(category.getId());
     }
 
     @Override
@@ -71,8 +86,16 @@ public class MainController implements IMainController {
     }
 
     @Override
-    public void addNewReview(String customer, String product, String rating, int stars, String summary, String details) {
-
+    public void addNewReview(String username, String prodNumber, int stars, String summary, String details) {
+        Session session = HibernateConnector.getSession();
+        session.beginTransaction();
+        Customer customer = new CustomerRepository().getCustomer(username);
+        Product product = new ProductRepository().getProduct(prodNumber);
+        Review review = new Review(customer, product, stars);
+        review.setSummary(summary);
+        review.setDetails(details);
+        session.save(review);
+        session.getTransaction().commit();
     }
 
     @Override
@@ -81,8 +104,19 @@ public class MainController implements IMainController {
     }
 
     @Override
-    public List<Customer> getTrolls(int ratingLimit) {
-        return null;
+    public List<Customer> getTrolls(double ratingLimit) {
+        ReviewRepository reviewRepository = new ReviewRepository();
+        CustomerRepository customerRepository = new CustomerRepository();
+        List<Customer> customers = customerRepository.getCustomers();
+        List<Customer> trolls = new ArrayList<>();
+        for (Customer c : customers) {
+            if (reviewRepository.getReviews(c.getUsername()).stream()
+                    .mapToInt(Review::getStars)
+                    .average().orElse(5.0) < ratingLimit) {
+                trolls.add(c);
+            }
+        }
+        return trolls;
     }
 
     @Override

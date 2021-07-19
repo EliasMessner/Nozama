@@ -13,6 +13,9 @@
 
   <session-factory>
 
+    <mapping class="com.unileipzig.shop.model.Category"/>
+    <mapping class="com.unileipzig.shop.model.Customer"/>
+    <mapping class="com.unileipzig.shop.model.Review"/>
     <mapping class="com.unileipzig.shop.model.Product"/>
     <mapping class="com.unileipzig.shop.model.Book"/>
     <mapping class="com.unileipzig.shop.model.Dvd"/>
