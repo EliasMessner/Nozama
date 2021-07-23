@@ -17,12 +17,12 @@ public class Category {
     @Id
     private int ID;
 
-    @OneToMany()
+    @ManyToMany()
     @JoinTable(name = "category_hierarchy", joinColumns = @JoinColumn(name = "super_category"),
             inverseJoinColumns = @JoinColumn(name = "sub_category"))
     private List<Category> children;
 
-    @OneToMany()
+    @ManyToMany()
     @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product"))
     private List<Product> products;
 

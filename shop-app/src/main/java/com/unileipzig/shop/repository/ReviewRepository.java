@@ -22,7 +22,7 @@ public class ReviewRepository {
 
     public List<Review> getReviews(String username) {
         Session session = HibernateConnector.getSession();
-        Query<Review> query = session.createQuery("FROM Review r WHERE r.customer.username = :username", Review.class);
+        Query<Review> query = session.createQuery("SELECT DISTINCT r FROM Review r INNER JOIN r.customer c WHERE c.username = :username", Review.class);
         query.setParameter("username", username);
         return query.list();
     }

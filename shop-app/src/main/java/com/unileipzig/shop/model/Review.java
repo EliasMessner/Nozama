@@ -10,6 +10,7 @@ import java.time.LocalDate;
 @Entity
 @DynamicInsert
 @DynamicUpdate
+@Table(name="review", schema="public")
 public class Review {
 
     @Id
@@ -17,11 +18,11 @@ public class Review {
     private long id;
 
     @ManyToOne()
-    @JoinTable(name = "customer", joinColumns = @JoinColumn(name = "username"))
+    @JoinColumn(name = "username")
     private Customer customer;
 
     @ManyToOne()
-    @JoinTable(name = "product", joinColumns = @JoinColumn(name = "prod_number"))
+    @JoinColumn(name = "prod_number")
     private Product product;
 
     @Check(constraints = "date <= CURRENT_DATE")
