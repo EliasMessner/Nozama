@@ -8,4 +8,3 @@ RUN mvn -f /usr/src/shop-app/pom.xml clean install
 FROM adoptopenjdk/openjdk11:alpine-jre
 WORKDIR /usr/jars
 COPY --from=build /usr/src/shop-app/target/shop-app-1.0-SNAPSHOT-jar-with-dependencies.jar .
-CMD ["java", "-jar", "shop-app-1.0-SNAPSHOT-jar-with-dependencies.jar"]

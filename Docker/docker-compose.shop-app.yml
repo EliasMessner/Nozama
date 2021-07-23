@@ -5,6 +5,7 @@ services:
         build:
             context: ..
             dockerfile: Docker/shop.Dockerfile
+        tty: true
         networks:
             - bridge_network
         depends_on:
