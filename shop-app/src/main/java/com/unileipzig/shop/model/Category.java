@@ -5,6 +5,7 @@ import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,8 @@ public class Category {
     private String name;
 
     @Id
-    private int ID;
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    private long ID;
 
     @ManyToMany()
     @JoinTable(name = "category_hierarchy", joinColumns = @JoinColumn(name = "super_category"),
@@ -23,7 +25,8 @@ public class Category {
     private List<Category> children;
 
     @ManyToMany()
-    @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product"))
+    @JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "category"),
+            inverseJoinColumns = @JoinColumn(name = "product"))
     private List<Product> products;
 
     public Category() {}
@@ -51,7 +54,7 @@ public class Category {
         return children;
     }
 
-    public int getId() {
+    public long getId() {
         return ID;
     }
 
@@ -61,5 +64,23 @@ public class Category {
 
     public List<Product> getProducts() {
         return products;
+    }
+
+    public String toString() {
+        StringBuilder buffer = new StringBuilder(50);
+        print(buffer, "", "");
+        return buffer.toString();
+    }
+
+    private void print(StringBuilder buffer, String prefix, String childrenPrefix) {
+        buffer.append(prefix).append(name).append("\n");
+        for (Iterator<Category> it = children.iterator(); it.hasNext();) {
+            Category next = it.next();
+            if (it.hasNext()) {
+                next.print(buffer, childrenPrefix + "├── ", childrenPrefix + "│   ");
+            } else {
+                next.print(buffer, childrenPrefix + "└── ", childrenPrefix + "    ");
+            }
+        }
     }
 }

@@ -18,11 +18,11 @@ public class Review {
     private long id;
 
     @ManyToOne()
-    @JoinColumn(name = "username")
+    @JoinColumn(name = "customer")
     private Customer customer;
 
     @ManyToOne()
-    @JoinColumn(name = "prod_number")
+    @JoinColumn(name = "product")
     private Product product;
 
     @Check(constraints = "date <= CURRENT_DATE")

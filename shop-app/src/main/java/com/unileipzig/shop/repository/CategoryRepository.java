@@ -23,25 +23,29 @@ public class CategoryRepository {
 
     public List<Category> getChildren(int id) {
         Session session = HibernateConnector.getSession();
-        Query<Category> query = session.createQuery("SELECT c.children FROM Category c INNER JOIN c.children WHERE " +
+        Query<Category> query = session.createQuery("SELECT DISTINCT c.children FROM Category c INNER JOIN c.children WHERE " +
                 "c.ID = :id", Category.class);
+        query.setParameter("id", id);
         return query.list();
     }
 
-    public Category getParent(int id) {
-        Category child = getCategory(id);
-        List<Category> categories = getCategories();
-        for (Category c : categories) {
-            if (c.getChildren().contains(child)) {
-                return c;
-            }
-        }
-        return null;
+    public List<Category> getParents(int id) {
+        Session session = HibernateConnector.getSession();
+        Query<Category> query = session.createQuery("SELECT DISTINCT c FROM Category c INNER JOIN c.children child WHERE " +
+                "child.ID = :id", Category.class);
+        query.setParameter("id", id);
+        return query.list();
     }
 
     public List<Category> getMainCategories() {
-        return getCategories().stream()
-                .filter(category -> getParent(category.getId()) == null)
-                .collect(Collectors.toList());
+        Session session = HibernateConnector.getSession();
+        Query<Category> query = session.createQuery("SELECT DISTINCT c1 FROM Category c1 INNER JOIN c1.children " +
+                "WHERE NOT EXISTS " +
+                "(SELECT c2 FROM Category c2 INNER JOIN c2.children child WHERE child.ID = c1.ID)", Category.class);
+        return query.list();
+
+//        return getCategories().stream()
+//                .filter(category -> getParents(category.getId()).isEmpty())
+//                .collect(Collectors.toList());
     }
 }

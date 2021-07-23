@@ -80,7 +80,7 @@ public class ProductRepository {
         }
     }
 
-    public List<Product> getProductsByCategoryId(int catID) {
+    public List<Product> getProductsByCategoryId(long catID) {
         Session session = HibernateConnector.getSession();
         Query<Product> query = session.createQuery("SELECT p FROM Category c INNER JOIN c.products p " +
                 "WHERE c.id = :catID", Product.class);
