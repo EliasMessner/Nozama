@@ -93,4 +93,9 @@ public class Review {
     public void setDetails(String details) {
         this.details = details;
     }
+
+    public String toString() {
+        return String.format("%s, %s\nStars: %d\nProduct: '%s':\nSummary: %s\nDetails: %s",
+                customer.getUsername(), date.toString(), stars, product.getTitle(), summary, details);
+    }
 }

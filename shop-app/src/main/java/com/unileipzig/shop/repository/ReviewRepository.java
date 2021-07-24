@@ -20,10 +20,17 @@ public class ReviewRepository {
         return query.list();
     }
 
-    public List<Review> getReviews(String username) {
+    public List<Review> getReviewsByUser(String username) {
         Session session = HibernateConnector.getSession();
         Query<Review> query = session.createQuery("SELECT DISTINCT r FROM Review r INNER JOIN r.customer c WHERE c.username = :username", Review.class);
         query.setParameter("username", username);
+        return query.list();
+    }
+
+    public List<Review> getReviewsByProduct(String prodNumber) {
+        Session session = HibernateConnector.getSession();
+        Query<Review> query = session.createQuery("SELECT DISTINCT r FROM Review r INNER JOIN r.product p WHERE p.prodNumber = :prodNumber", Review.class);
+        query.setParameter("prodNumber", prodNumber);
         return query.list();
     }
 }

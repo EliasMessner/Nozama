@@ -15,29 +15,23 @@ public class ProductRepository {
 
     public Product getProduct(String prodNumber) {
         Session session = HibernateConnector.getSession();
-
         return session.get(Product.class, prodNumber);
     }
 
     public Product getProductDetails(String prodNumber) {
         Session session = HibernateConnector.getSession();
-
         Product product = session.get(Book.class, prodNumber);
-
         if (product == null) {
             product = session.get(Dvd.class, prodNumber);
         }
-
         if (product == null) {
             product = session.get(MusicCd.class, prodNumber);
         }
-
         return product;
     }
 
     public List<Product> getProducts(String titlePattern) {
         Session session = HibernateConnector.getSession();
-
         Query<Product> query = session.createQuery("FROM Product WHERE title LIKE :pattern", Product.class);
         query.setParameter("pattern", titlePattern);
         return query.list();
@@ -45,15 +39,16 @@ public class ProductRepository {
 
     public List<Product> getTopProducts(int number) {
         Session session = HibernateConnector.getSession();
-
-        Query<Product> query = session.createQuery("FROM Product p ORDER BY p.rating DESC, p.prodNumber ASC", Product.class);
+        Query<Product> query = session.createQuery(
+                "SELECT p " +
+                "FROM Product p " +
+                "ORDER BY p.rating DESC, p.salesRank ASC, p.prodNumber ASC", Product.class);
         query.setMaxResults(number);
         return query.list();
     }
 
     public List<Product> getSimilarProducts(String prodNumber) {
         Session session = HibernateConnector.getSession();
-
         Query<Product> query = session.createQuery("SELECT sp FROM Product p INNER JOIN p.similarProducts sp WHERE " +
                 "p.prodNumber = :givenProdNumber", Product.class);
         query.setParameter("givenProdNumber", prodNumber);
@@ -62,14 +57,11 @@ public class ProductRepository {
 
     public List<Product> getCheaperProducts(String prodNumber) {
         Product givenProduct = this.getProduct(prodNumber);
-
         Session session = HibernateConnector.getSession();
-
         Query<BigDecimal> queryMin = session.createQuery("SELECT MIN(price) FROM Offer o WHERE o.product = :givenProduct",
                 BigDecimal.class);
         queryMin.setParameter("givenProduct", givenProduct);
         BigDecimal minPrice = queryMin.getSingleResult();
-
         if (minPrice == null) {
             return null;
         } else {

@@ -108,4 +108,12 @@ public class Product {
     public void addSimilarProduct(Product similarProduct) {
         this.similarProducts.add(similarProduct);
     }
+
+    public String toString() {
+        return String.format("Product-number: %s\n" +
+                "Title: %s\n" +
+                "Rating: %1.2f\n" +
+                "Sales-Rank: %d",
+                prodNumber, title, rating, salesRank);
+    }
 }

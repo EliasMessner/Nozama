@@ -8,6 +8,7 @@ import com.unileipzig.shop.model.*;
 import com.unileipzig.shop.repository.*;
 import org.hibernate.Session;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ public class MainController implements IMainController {
     @Override
     public List<Product> getProducts(String titlePattern) {
         ProductRepository prodRepo = new ProductRepository();
+        if (titlePattern == null) titlePattern = "%";
         return prodRepo.getProducts(titlePattern);
     }
 
@@ -84,15 +86,12 @@ public class MainController implements IMainController {
         ProductRepository prodRepo = new ProductRepository();
         List<Product> similarProducts = prodRepo.getSimilarProducts(prodNumber);
         List<Product> cheaperProducts = prodRepo.getCheaperProducts(prodNumber);
-
         if (cheaperProducts == null) {
             throw new InputException("Product " + prodNumber + " is not available in any store");
         }
-
         List<Product> similarAndCheaperProducts = similarProducts.stream()
                 .filter(cheaperProducts::contains)
                 .collect(Collectors.toList());
-
         return similarAndCheaperProducts;
     }
 
@@ -103,6 +102,7 @@ public class MainController implements IMainController {
         Customer customer = new CustomerRepository().getCustomer(username);
         Product product = new ProductRepository().getProduct(prodNumber);
         Review review = new Review(customer, product, stars);
+        review.setDate(LocalDate.now());
         review.setSummary(summary);
         review.setDetails(details);
         session.save(review);
@@ -119,7 +119,7 @@ public class MainController implements IMainController {
             return trolls;
         }
         for (Customer c : customers) {
-            if (reviewRepository.getReviews(c.getUsername()).stream()
+            if (reviewRepository.getReviewsByUser(c.getUsername()).stream()
                     .mapToInt(Review::getStars)
                     .average().orElse(5.0) < ratingLimit) {
                 trolls.add(c);
@@ -132,5 +132,10 @@ public class MainController implements IMainController {
     public List<Offer> getOffers(String prodNumber) {
         OfferRepository offerRepo = new OfferRepository();
         return offerRepo.getOffers(prodNumber);
+    }
+
+    public List<Review> getReviewsByProdNumber(String prodNumber) {
+        ReviewRepository reviewRepository = new ReviewRepository();
+        return reviewRepository.getReviewsByProduct(prodNumber);
     }
 }
