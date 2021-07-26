@@ -67,4 +67,13 @@ public class Offer {
     public void setPrice(BigDecimal price) {
         this.price = price;
     }
+
+    public String toString() {
+        return String.format("Offer-ID: %d\n" +
+                "Store: %s\n" +
+                "Product: %s\n" +
+                "Price: %6.2f\n" +
+                "Condition: %s", id, store.toString(), product.getTitle(), price, articleCondition);
+    }
+
 }

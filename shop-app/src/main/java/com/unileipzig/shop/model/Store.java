@@ -48,5 +48,9 @@ public class Store {
     public void setZip(String zip) {
         this.zip = zip;
     }
+
+    public String toString() {
+        return String.format("%s, %s, %s", name, street, zip);
+    }
 }
 
