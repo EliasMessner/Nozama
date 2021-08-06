@@ -22,7 +22,7 @@ public class Review {
     private Customer customer;
 
     @ManyToOne()
-    @JoinColumn(name = "product")
+    @JoinColumn(name = "product", nullable = false)
     private Product product;
 
     @Check(constraints = "date <= CURRENT_DATE")
