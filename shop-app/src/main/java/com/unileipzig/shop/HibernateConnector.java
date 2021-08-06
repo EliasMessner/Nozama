@@ -9,6 +9,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 public class HibernateConnector {
 
     private static SessionFactory sessionFactory;
+    private static final Session[] sessions = new Session[1];
 
     public static void initSessionFactory() {
         // A SessionFactory is set up once for an application!
@@ -27,11 +28,23 @@ public class HibernateConnector {
 
     }
 
+    public static void initSession() {
+        sessions[0] = sessionFactory.openSession();
+    }
+
     public static void finishSessionFactory() {
         sessionFactory.close();
     }
 
+    public static void finishSessions() {
+        for (Session session: sessions) {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
     public static Session getSession() {
-        return sessionFactory.openSession();
+        return sessions[0];
     }
 }

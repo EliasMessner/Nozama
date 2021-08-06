@@ -17,10 +17,12 @@ public class MainController implements IMainController {
     @Override
     public void init() throws ClassNotFoundException {
         HibernateConnector.initSessionFactory();
+        HibernateConnector.initSession();
     }
 
     @Override
     public void finish() {
+        HibernateConnector.finishSessions();
         HibernateConnector.finishSessionFactory();
     }
 

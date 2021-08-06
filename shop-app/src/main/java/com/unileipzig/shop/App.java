@@ -98,7 +98,7 @@ public class App {
     }
 
     private static void askForActionLoop(MainController mainController, Scanner scanner) throws ClassNotFoundException {
-        System.out.println("Do you want to initialize the database? (Y/N)");
+        System.out.println("Do you want to initialize Hibernate (including the database connection)? (Y/N)");
         while (true) {
             if (!scanner.hasNextLine()) continue;
             String input = scanner.nextLine().toLowerCase();
