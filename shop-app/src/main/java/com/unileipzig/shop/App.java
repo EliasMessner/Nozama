@@ -3,16 +3,15 @@ package com.unileipzig.shop;
 import com.unileipzig.shop.controller.MainController;
 import com.unileipzig.shop.exceptions.AmbiguousCategoryNameException;
 import com.unileipzig.shop.exceptions.CategoryNotFoundException;
+import com.unileipzig.shop.exceptions.InputException;
 import com.unileipzig.shop.model.*;
 import org.hibernate.exception.ConstraintViolationException;
 
 import java.util.*;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class App {
 
-    public static void main( String[] args ) throws ClassNotFoundException, InputException {
+    public static void main( String[] args ) {
         MainController mainController = new MainController();
         Scanner scanner = new Scanner(System.in);
         askForActionLoop(mainController, scanner);
@@ -97,7 +96,7 @@ public class App {
         return inputTokens.toArray(String[]::new);
     }
 
-    private static void askForActionLoop(MainController mainController, Scanner scanner) throws ClassNotFoundException {
+    private static void askForActionLoop(MainController mainController, Scanner scanner) {
         System.out.println("Do you want to initialize Hibernate (including the database connection)? (Y/N)");
         while (true) {
             if (!scanner.hasNextLine()) continue;

@@ -1,6 +1,6 @@
 package com.unileipzig.shop.controller;
 
-import com.unileipzig.shop.InputException;
+import com.unileipzig.shop.exceptions.InputException;
 import com.unileipzig.shop.exceptions.AmbiguousCategoryNameException;
 import com.unileipzig.shop.exceptions.CategoryNotFoundException;
 import com.unileipzig.shop.model.*;
@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface IMainController {
 
-    public void init() throws ClassNotFoundException;
+    public void init();
 
     public void finish();
 
