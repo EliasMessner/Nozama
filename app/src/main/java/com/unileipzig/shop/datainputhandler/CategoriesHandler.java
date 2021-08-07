@@ -110,7 +110,7 @@ public class CategoriesHandler extends DefaultHandler {
 
     private void addCategoryNameIfNotSet() {
         if (!elementValue.toString().isBlank()) {
-            current.setName(elementValue.toString());
+            current.setName(elementValue.toString().trim());
             elementValue = new StringBuilder();
         }
     }

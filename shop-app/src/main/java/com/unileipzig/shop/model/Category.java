@@ -13,11 +13,12 @@ import java.util.List;
 @DynamicUpdate
 public class Category {
 
-    private String name;
-
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private long ID;
+
+    @Column(nullable = false)
+    private String name;
 
     @ManyToMany()
     @JoinTable(name = "category_hierarchy", joinColumns = @JoinColumn(name = "super_category"),

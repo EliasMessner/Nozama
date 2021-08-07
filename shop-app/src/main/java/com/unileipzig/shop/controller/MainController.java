@@ -1,7 +1,7 @@
 package com.unileipzig.shop.controller;
 
 import com.unileipzig.shop.HibernateConnector;
-import com.unileipzig.shop.InputException;
+import com.unileipzig.shop.exceptions.InputException;
 import com.unileipzig.shop.exceptions.AmbiguousCategoryNameException;
 import com.unileipzig.shop.exceptions.CategoryNotFoundException;
 import com.unileipzig.shop.model.*;
@@ -15,12 +15,14 @@ import java.util.stream.Collectors;
 public class MainController implements IMainController {
 
     @Override
-    public void init() throws ClassNotFoundException {
+    public void init() {
         HibernateConnector.initSessionFactory();
+        HibernateConnector.initSession();
     }
 
     @Override
     public void finish() {
+        HibernateConnector.finishSessions();
         HibernateConnector.finishSessionFactory();
     }
 

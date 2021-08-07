@@ -14,7 +14,7 @@ public class Store {
     @Column(nullable = false)
     private String street;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 5)
     private String zip;
 
     public Store(){};

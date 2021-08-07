@@ -1,4 +1,4 @@
-package com.unileipzig.shop;
+package com.unileipzig.shop.exceptions;
 
 public class InputException extends Exception {
 
