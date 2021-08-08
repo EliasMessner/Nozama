@@ -92,4 +92,12 @@ public class MusicCd extends Product {
     public void addArtist(Person artist) {
         this.artists.add(artist);
     }
+
+    @Override
+    public String toString() {
+        return String.format(super.toString() +
+                "Product Type: Music-CD\n" +
+                "Publication Date: %s\n",
+                publicationDate);
+    }
 }

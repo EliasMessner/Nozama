@@ -33,4 +33,11 @@ public class ReviewRepository {
         query.setParameter("prodNumber", prodNumber);
         return query.list();
     }
+
+    public void addNewReview(Review review) {
+        Session session = HibernateConnector.getSession();
+        session.beginTransaction();
+        session.save(review);
+        session.getTransaction().commit();
+    }
 }

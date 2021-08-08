@@ -114,4 +114,14 @@ public class Dvd extends Product {
     public void addDirector(Person director) {
         this.directors.add(director);
     }
+
+    @Override
+    public String toString() {
+        return String.format(super.toString() +
+                        "Product Type: DVD\n" +
+                        "Format: %s\n" +
+                        "Duration: %d min\n" +
+                        "Region Code: %d\n",
+                format, durationMinutes, regionCode);
+    }
 }

@@ -96,4 +96,14 @@ public class Book extends Product {
     public void addAuthor(Person author) {
         authors.add(author);
     }
+
+    @Override
+    public String toString() {
+        return String.format(super.toString() +
+                        "Product Type: Book\n" +
+                        "Publication Date: %s\n" +
+                        "ISBN: %s\n" +
+                        "Page Count: %d\n",
+                publicationDate, isbn, pageNumber);
+    }
 }

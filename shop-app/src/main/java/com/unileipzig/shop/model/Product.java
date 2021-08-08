@@ -112,7 +112,7 @@ public class Product {
         return String.format("Product-number: %s\n" +
                 "Title: %s\n" +
                 "Rating: %1.2f\n" +
-                "Sales-Rank: %d",
+                "Sales-Rank: %d\n",
                 prodNumber, title, rating, salesRank);
     }
 }
