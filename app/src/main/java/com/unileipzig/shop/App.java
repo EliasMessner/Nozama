@@ -1,5 +1,6 @@
 package com.unileipzig.shop;
 
+import com.unileipzig.shop.datainputhandler.*;
 import org.xml.sax.SAXException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;

@@ -1,19 +1,15 @@
 CREATE TABLE store(
-	s_name VARCHAR,
-	street VARCHAR,
-    zip CHAR(5),
-	PRIMARY KEY(s_name, street, zip)
+	s_name VARCHAR PRIMARY KEY,
+	street VARCHAR NOT NULL,
+    zip CHAR(5) NOT NULL
 );
 
 CREATE TABLE store_inventory(
-	artID SERIAL PRIMARY KEY,
-    product VARCHAR REFERENCES product(prod_number),
-	store_name VARCHAR,
-	store_street VARCHAR,
-	store_zip CHAR(5),
+	id SERIAL PRIMARY KEY,
+    product VARCHAR NOT NULL REFERENCES product(prod_number),
+	store_name VARCHAR NOT NULL REFERENCES store(s_name),
 	article_condition VARCHAR NOT NULL,
-	price DECIMAL(10,2) CHECK (price IS NULL OR price >= 0),
-	FOREIGN KEY (store_name, store_street, store_zip) REFERENCES store(s_name, street, zip)
+	price DECIMAL(10,2) CHECK (price IS NULL OR price >= 0)
 );
 
 CREATE INDEX ON store_inventory (product);
@@ -39,7 +35,7 @@ CREATE TABLE sale(
 CREATE TABLE review(
     id SERIAL PRIMARY KEY,
 	customer VARCHAR REFERENCES customer(username),
-    product VARCHAR REFERENCES product(prod_number),
+    product VARCHAR NOT NULL REFERENCES product(prod_number),
     date DATE CHECK(date <= CURRENT_DATE),
 	stars INT NOT NULL,
 	summary VARCHAR,
@@ -94,4 +90,4 @@ EXECUTE PROCEDURE check_exists_as_subtype();
 
 CREATE INDEX ON review (customer);
 
-CREATE INDEX ON store_inventory (store_name, store_street, store_zip);
+CREATE INDEX ON store_inventory (store_name);
