@@ -25,7 +25,7 @@ public interface IMainController {
 
     public List<Product> getSimilarCheaperProducts(String prodNumber) throws InputException;
 
-    public void addNewReview(String customer, String product, int stars, String summary, String details);
+    public void addNewReview(String customer, String product, int stars, String summary, String details) throws InputException;
 
     public List<Customer> getTrolls(double ratingLimit);
 

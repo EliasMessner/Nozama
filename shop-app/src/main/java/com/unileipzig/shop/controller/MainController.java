@@ -98,17 +98,23 @@ public class MainController implements IMainController {
     }
 
     @Override
-    public void addNewReview(String username, String prodNumber, int stars, String summary, String details) {
-        Session session = HibernateConnector.getSession();
-        session.beginTransaction();
-        Customer customer = new CustomerRepository().getCustomer(username);
+    public void addNewReview(String username, String prodNumber, int stars, String summary, String details) throws InputException {
+        Customer customer = null;
+        if (!username.equals("guest")) {
+            customer = new CustomerRepository().getCustomer(username);
+            if (customer == null) {
+                throw new InputException(String.format("Customer with username %s does not exist.", username));
+            }
+        }
         Product product = new ProductRepository().getProduct(prodNumber);
+        if (product == null) {
+            throw new InputException(String.format("Product number %s does not exist.", prodNumber));
+        }
         Review review = new Review(customer, product, stars);
         review.setDate(LocalDate.now());
         review.setSummary(summary);
         review.setDetails(details);
-        session.save(review);
-        session.getTransaction().commit();
+        new ReviewRepository().addNewReview(review);
     }
 
     @Override
