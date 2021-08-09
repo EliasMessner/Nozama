@@ -14,7 +14,8 @@ public class OfferRepository {
         ProductRepository prodRepo = new ProductRepository();
         Product givenProduct = prodRepo.getProduct(prodNumber);
         Session session = HibernateConnector.getSession();
-        Query<Offer> query = session.createQuery("FROM Offer o WHERE o.product = :givenProduct", Offer.class);
+        Query<Offer> query = session.createQuery("FROM Offer o WHERE o.product = :givenProduct AND o.price " +
+                "IS NOT NULL", Offer.class);
         query.setParameter("givenProduct", givenProduct);
         return query.list();
     }
