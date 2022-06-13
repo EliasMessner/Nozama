@@ -1,19 +1,25 @@
-# Get Started  
+# Nozama
 
-Create new Database (by means of a Script executed in a Docker Container): `docker-compose -f docker-compose.base.yml -f
+Nozama is a media shop for books, dvds and music cds. It was created as part of the [media store project](https://git.informatik.uni-leipzig.de/dbs/dbpraktikum-mediastore/-/tree/d10a346bd543da2ad86c7bedd09a0d806335995c) 
+at Leipzig University.  
+Nozama consists of two separate applications. The application in the app/ directory is responsible for reading the 
+available products from XML and CSV files. It puts the available products into a postgres database. The actual media shop application is located in the shop-app/ 
+directory. It consists of a backend that utilizes Hibernate and a console application that allows reading product information (price, quantity etc.) and adding reviews.
+
+### Get Started  
+
+Switch to the Docker/ directory: `cd Docker`
+
+Create the database container and create a new database: `docker-compose -f docker-compose.base.yml -f
 docker-compose.psqlseed.yml up -d --build`  
 
-Load Data into Database: `docker-compose -f docker-compose.base.yml -f docker-compose.app.yml up -d --build`  
+Load the products into the database: `docker-compose -f docker-compose.base.yml -f docker-compose.app.yml up -d --build`  
 
-Start and Access Shop Container: `docker-compose -f docker-compose.base.yml -f docker-compose.shop-app.yml up -d --build 
+Create and access the shop container: `docker-compose -f docker-compose.base.yml -f docker-compose.shop-app.yml up -d --build 
 && docker exec -it docker_shop-app_1 sh`   
 
-Start Shop Application: `java -jar shop-app-1.0-SNAPSHOT-jar-with-dependencies.jar`  
+Start the console application: `java -jar shop-app-1.0-SNAPSHOT-jar-with-dependencies.jar`
 
-Inspect Docker Containers: `docker-compose logs -f`  
+Stop and remove the database container: `docker-compose -f docker-compose.base.yml down`
 
-Stop Docker Database Containers: `docker-compose -f docker-compose.base.yml`  
-
-(note: every Docker-related command needs to be executed from inside the 'Docker' directory)
-
-You can inspect the database at http://localhost:8080/.  
+In debug mode, you can inspect the product database at http://localhost:8080/.  
