@@ -3,8 +3,8 @@
 Nozama is a media shop for books, dvds and music cds. It was created as part of the [media store project](https://git.informatik.uni-leipzig.de/dbs/dbpraktikum-mediastore/-/tree/d10a346bd543da2ad86c7bedd09a0d806335995c) 
 at Leipzig University.  
 Nozama consists of two separate applications. The application in the app/ directory is responsible for reading the 
-available products from XML files. It puts the available products into a postgres database. The actual media shop application is located in the shop-app/ directory.
-It consists of a backend that utilizes Hibernate and a console application that allows reading product information (price, quantity etc.) and adding reviews.
+available products from XML and CSV files. It puts the available products into a postgres database. The actual media shop application is located in the shop-app/ 
+directory. It consists of a backend that utilizes Hibernate and a console application that allows reading product information (price, quantity etc.) and adding reviews.
 
 ### Get Started  
 
